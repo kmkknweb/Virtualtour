@@ -44,9 +44,16 @@ body{background:#0a0500;font-family:"Noto Sans Thai",sans-serif;height:100vh;ove
 <div id="hint">ลากซ้ายขวาเพื่อมองรอบทิศทาง · Pinch เพื่อ zoom</div>
 <script>
 pannellum.viewer('panorama', {
-  type: 'cylindrical',
-cylindricalAngle: 360,
-  panorama: 'tour_360.jpg',
+type: 'multires',
+multiRes: {
+  basePath: '.',
+  path: 'tour_360.jpg',
+  fallbackPath: 'tour_360.jpg',
+  extension: 'jpg',
+  tileResolution: 512,
+  maxLevel: 1,
+  cubeResolution: 1000
+},
   autoLoad: true,
   autoRotate: -2,
   autoRotateInactivityDelay: 3000,
