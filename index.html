@@ -654,9 +654,9 @@ const SCENES = {
     // TODO: ปรับ pitch/yaw ให้ตรงตำแหน่งองค์เทพจริงใน pano_inside.jpg
     hotspots:[
       {pitch:-5,yaw:-150,nav:false,icon:'👴',tip:'องค์ปึงเถ่ากงม่า', action:()=>openDeityPanel('pueng')},
-      {pitch:-5,yaw:-90, nav:false,icon:'🔴',tip:'เจ้าแม่ทับทิม',    action:()=>openDeityPanel('thapthim')},
+      {pitch:-5,yaw:-110, nav:false,icon:'🔴',tip:'เจ้าแม่ทับทิม',    action:()=>openDeityPanel('thapthim')},
       {pitch:-5,yaw:0,   nav:true, icon:'🚪',tip:'กลับลานกลาง',      action:()=>goScene('center')},
-      {pitch:-5,yaw:90,  nav:false,icon:'💛',tip:'องค์ไฉ่ซิงเอี๊ย', action:()=>openDeityPanel('caishen')},
+      {pitch:-5,yaw:110,  nav:false,icon:'💛',tip:'องค์ไฉ่ซิงเอี๊ย', action:()=>openDeityPanel('caishen')},
     ]
   },
   hall: {
@@ -670,14 +670,18 @@ const SCENES = {
   nanning: {
     label:'สวนหนานหนิง', pano:'pano/pano_nanning.jpg', dotIndex:3, defaultYaw:0,
     hotspots:[
+     
+      {pitch:-5,yaw:-175,nav:true, icon:'🚪',tip:'กลับหน้าศาลเจ้า', action:()=>goScene('front')},
       {pitch:-5,yaw:30,nav:true,icon:'🪷',tip:'ลานเจ้าแม่กวนอิม',action:()=>goScene('guanyin_plaza')},
     ]
   },
   guanyin_plaza: {
     label:'ลานเจ้าแม่กวนอิม', pano:'pano/pano_guanyin_plaza.jpg', dotIndex:4, defaultYaw:-180,
     hotspots:[
+     
+      {pitch:-5,yaw:-175,nav:true, icon:'🚪',tip:'กลับสวนหนานหนิง', action:()=>goScene('nanning')},
       {pitch:-5,yaw:-150,nav:false,icon:'🪷',tip:'เจ้าแม่กวนอิม',action:()=>openDeityPanel('guanyin')},
-      {pitch:-5,yaw:90,  nav:false,icon:'🔥',tip:'องค์นาจา',      action:()=>openDeityPanel('naja')},
+      {pitch:-5,yaw:110,  nav:false,icon:'🔥',tip:'องค์นาจา',      action:()=>openDeityPanel('naja')},
     ]
   },
 };
