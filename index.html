@@ -1181,7 +1181,7 @@ let slipBase64 = null;
    ============================================================ */
 function startFlyIn() {
   // ถ้าไม่มี Mapbox token ให้ข้ามไปทัวร์เลย
-  if (CONFIG.MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
+  if (CONFIG.MAPBOX_TOKEN === 'pk.eyJ1IjoiamFyb2VudGEiLCJhIjoiY21vMmhiNWJ2MHU0YzJyb24yNG5wbGFwMiJ9.C3TwRwKjHhV7uHqzaSKJnw') {
     enterTour();
     return;
   }
@@ -1189,7 +1189,7 @@ function startFlyIn() {
   mapboxgl.accessToken = CONFIG.MAPBOX_TOKEN;
   map = new mapboxgl.Map({
     container: 'mapbox-container',
-    style: 'mapbox://styles/mapbox/satellite-streets-v12',
+    style: 'mapbox://styles/mapbox/satellite-v9',
     center: [100, 15],
     zoom: 3, pitch: 0, bearing: 0, antialias: true
   });
