@@ -700,7 +700,7 @@ const SCENES = {
 };
 
 /* STATE */
-let viewer=null, currentDeity=null, currentAudio=null, bgAudio=null;
+let viewer=null, currentDeity=null, currentAudio=null, bgAudio=null, lastScene='front';
 let hallImgShown=false;
 
 /* INIT */
@@ -761,6 +761,7 @@ document.querySelectorAll('.scene-dot').forEach(dot=>{
 });
 function goScene(id){
   const sc=SCENES[id];if(!sc)return;
+ lastScene=id;
   if(sc.isImage){
     showScreen('screen-tour');
     document.getElementById('hall-overlay').style.display='flex';
@@ -1059,7 +1060,7 @@ document.getElementById('btn-back-from-cert').addEventListener('click',()=>{
   showScreen('screen-tour');
   // reload panorama ใหม่ป้องกันเบลอ
   if(viewer){viewer.destroy();viewer=null;}
-  setTimeout(()=>goScene('front'),100);
+  setTimeout(()=>goScene(lastScene||'front'),100);
 });
 </script>
 </body>
