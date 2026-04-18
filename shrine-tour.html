@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ศาลเจ้าปึงเถ่ากงม่าขอนแก่น · Virtual Tour</title>
+
+<!-- Pannellum 360 viewer -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+
+<!-- Mapbox GL JS -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   CSS VARIABLES & RESET
+   ============================================================ */
+:root {
+  --gold:        #C8901A;
+  --gold-light:  #E8B84B;
+  --gold-pale:   #F5D98A;
+  --gold-dim:    #7A5510;
+  --red:         #8B1A1A;
+  --red-dark:    #4A0A0A;
+  --ink:         #080300;
+  --ink-2:       #130800;
+  --cream:       #F5EDD5;
+  --cream-dim:   #C9A96E;
+  --cream-faint: #8A6D3A;
+  --panel-bg:    rgba(6,2,0,0.97);
+  --overlay-bg:  rgba(6,2,0,0.88);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; height:100%; overflow:hidden; background:var(--ink); font-family:'Noto Sans Thai', sans-serif; }
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen { position:fixed; inset:0; z-index:10; display:none; }
+.screen.active { display:block; }
+
+/* ============================================================
+   SCREEN 1: MAP FLY-IN
+   ============================================================ */
+#screen-map { z-index:10; }
+#mapbox-container { position:absolute; inset:0; }
+
+#map-overlay {
+  position:absolute; inset:0; z-index:20;
+  background: radial-gradient(ellipse at center, rgba(6,2,0,0.5) 0%, rgba(6,2,0,0.85) 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition: opacity 1.5s ease;
+}
+#map-overlay.fade-out { opacity:0; pointer-events:none; }
+
+.shrine-emblem {
+  width:100px; height:100px; border-radius:50%;
+  border:1.5px solid var(--gold);
+  box-shadow: 0 0 30px rgba(200,144,26,0.4), inset 0 0 20px rgba(200,144,26,0.1);
+  display:flex; align-items:center; justify-content:center;
+  font-size:48px; margin-bottom:24px;
+  animation: emblem-glow 3s ease-in-out infinite;
+}
+@keyframes emblem-glow {
+  0%,100% { box-shadow:0 0 30px rgba(200,144,26,0.4),inset 0 0 20px rgba(200,144,26,0.1); }
+  50%      { box-shadow:0 0 50px rgba(200,144,26,0.7),inset 0 0 30px rgba(200,144,26,0.2); }
+}
+
+.shrine-name-th {
+  font-family:'Noto Serif Thai', serif;
+  font-size:clamp(20px,5vw,28px); font-weight:700;
+  color:var(--gold-light);
+  text-shadow:0 0 30px rgba(200,144,26,0.6);
+  text-align:center; line-height:1.6; margin-bottom:6px;
+}
+.shrine-name-sub {
+  font-size:12px; color:var(--cream-dim); letter-spacing:2px;
+  text-align:center; margin-bottom:36px;
+}
+
+.btn-start {
+  padding:14px 40px; border:1px solid var(--gold);
+  background:linear-gradient(135deg, rgba(200,144,26,0.15), rgba(200,144,26,0.05));
+  color:var(--gold-light); font-family:'Noto Serif Thai',serif;
+  font-size:16px; font-weight:600; letter-spacing:1px;
+  border-radius:2px; cursor:pointer;
+  box-shadow:0 0 20px rgba(200,144,26,0.2);
+  transition:all 0.3s ease; position:relative; overflow:hidden;
+}
+.btn-start::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(200,144,26,0.3), transparent);
+  opacity:0; transition:opacity 0.3s;
+}
+.btn-start:hover::before { opacity:1; }
+.btn-start:hover { box-shadow:0 0 35px rgba(200,144,26,0.5); transform:translateY(-1px); }
+
+#fly-in-badge {
+  position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+  background:rgba(6,2,0,0.8); border:1px solid rgba(200,144,26,0.3);
+  padding:10px 24px; border-radius:20px; z-index:25;
+  font-size:12px; color:var(--cream-dim); display:none;
+  backdrop-filter:blur(10px);
+}
+
+/* ============================================================
+   SCREEN 2: PANORAMA TOUR
+   ============================================================ */
+#screen-tour { z-index:10; }
+#pannellum-container { position:absolute; inset:0; }
+
+/* Tour HUD */
+#tour-hud {
+  position:absolute; top:0; left:0; right:0; z-index:50;
+  padding:16px 20px;
+  background:linear-gradient(to bottom, rgba(6,2,0,0.8), transparent);
+  display:flex; align-items:center; justify-content:space-between;
+  pointer-events:none;
+}
+.hud-left { display:flex; align-items:center; gap:12px; }
+.hud-icon { font-size:20px; }
+.hud-title {
+  font-family:'Noto Serif Thai',serif; font-size:15px; font-weight:600;
+  color:var(--gold-light);
+}
+.hud-sub { font-size:11px; color:var(--cream-dim); margin-top:2px; }
+
+/* Mini map dots navigation */
+#scene-nav {
+  position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+  z-index:50; display:flex; align-items:center; gap:8px;
+  background:rgba(6,2,0,0.75); border:1px solid rgba(200,144,26,0.25);
+  padding:10px 18px; border-radius:30px; backdrop-filter:blur(10px);
+}
+.scene-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:rgba(200,144,26,0.3); border:1px solid rgba(200,144,26,0.5);
+  cursor:pointer; transition:all 0.3s; pointer-events:all;
+}
+.scene-dot.active { background:var(--gold-light); box-shadow:0 0 8px var(--gold); }
+.scene-dot-label { font-size:10px; color:var(--cream-dim); margin-left:4px; }
+
+/* Back button */
+#btn-back-map {
+  position:absolute; top:16px; right:20px; z-index:51;
+  background:rgba(6,2,0,0.7); border:1px solid rgba(200,144,26,0.3);
+  color:var(--cream-dim); font-size:12px; padding:6px 14px;
+  border-radius:20px; cursor:pointer; backdrop-filter:blur(8px);
+  pointer-events:all; transition:all 0.3s;
+}
+#btn-back-map:hover { border-color:var(--gold); color:var(--gold-light); }
+
+/* ============================================================
+   PANNELLUM CUSTOM HOTSPOT STYLE
+   ============================================================ */
+.custom-hotspot {
+  width:44px; height:44px; border-radius:50%;
+  background:radial-gradient(circle, rgba(200,144,26,0.4), rgba(200,144,26,0.1));
+  border:2px solid var(--gold-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; cursor:pointer;
+  box-shadow:0 0 20px rgba(200,144,26,0.6);
+  animation:hotspot-pulse 2.5s ease-in-out infinite;
+  transition:transform 0.2s;
+}
+.custom-hotspot:hover { transform:scale(1.15); }
+@keyframes hotspot-pulse {
+  0%,100% { box-shadow:0 0 15px rgba(200,144,26,0.5); }
+  50%      { box-shadow:0 0 35px rgba(200,144,26,0.9),0 0 60px rgba(200,144,26,0.3); }
+}
+.hotspot-nav { background:radial-gradient(circle,rgba(100,180,255,0.3),rgba(100,180,255,0.05)); border-color:#7CB9E8; }
+.hotspot-nav .ch { color:#B8DFFF; }
+
+/* ============================================================
+   DEITY PANEL (slide up from bottom)
+   ============================================================ */
+#deity-panel {
+  position:fixed; inset:0; z-index:200;
+  display:none; align-items:flex-end;
+}
+#deity-panel.open { display:flex; }
+
+#deity-backdrop {
+  position:absolute; inset:0;
+  background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+}
+#deity-card {
+  position:relative; z-index:1;
+  width:100%; max-width:480px; margin:0 auto;
+  background:linear-gradient(175deg, #120600, #0a0200);
+  border:1px solid rgba(200,144,26,0.3);
+  border-bottom:none;
+  border-radius:20px 20px 0 0;
+  padding:0 0 32px;
+  transform:translateY(100%);
+  transition:transform 0.5s cubic-bezier(0.34,1.3,0.64,1);
+  max-height:92vh; overflow-y:auto;
+}
+#deity-card.slide-in { transform:translateY(0); }
+
+.panel-drag { width:40px;height:4px;border-radius:2px;background:rgba(200,144,26,0.3);margin:12px auto 0; }
+
+.deity-img-wrap {
+  width:100%; height:220px; overflow:hidden; position:relative;
+  margin-top:12px;
+}
+.deity-img-wrap::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:60px;
+  background:linear-gradient(to bottom, transparent, #120600);
+}
+.deity-img-wrap img {
+  width:100%; height:100%; object-fit:cover; object-position:center top;
+  /* TODO: เปลี่ยนเป็นภาพจริงของแต่ละองค์เทพ */
+}
+.deity-img-placeholder {
+  width:100%; height:100%;
+  background:linear-gradient(135deg, #1a0800, #2a1000);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:64px; gap:8px;
+}
+.deity-img-placeholder span { font-size:13px; color:var(--cream-faint); font-family:'Noto Serif Thai',serif; }
+
+.deity-info { padding:16px 24px 0; }
+.deity-name-th {
+  font-family:'Noto Serif Thai',serif; font-size:22px; font-weight:700;
+  color:var(--gold-light); text-shadow:0 0 20px rgba(200,144,26,0.4);
+  margin-bottom:2px;
+}
+.deity-name-zh { font-size:13px; color:var(--cream-dim); margin-bottom:4px; }
+.deity-wish { font-size:11px; color:var(--gold-dim); background:rgba(200,144,26,0.1); border:1px solid rgba(200,144,26,0.2); display:inline-block; padding:3px 10px; border-radius:20px; margin-bottom:14px; }
+
+.deity-history {
+  font-size:13.5px; color:var(--cream-dim); line-height:1.9;
+  margin-bottom:20px;
+  /* NOTE: เพิ่มประวัติเต็มของแต่ละองค์เทพตรงนี้ */
+}
+
+/* Audio player */
+.deity-audio {
+  display:flex; align-items:center; gap:10px;
+  background:rgba(200,144,26,0.07); border:1px solid rgba(200,144,26,0.2);
+  border-radius:10px; padding:12px 16px; margin-bottom:16px;
+  /* NOTE: เชื่อม audio file ของแต่ละองค์เทพที่นี่ */
+}
+.audio-btn {
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--gold);
+  background:rgba(200,144,26,0.15); color:var(--gold-light);
+  font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s; flex-shrink:0;
+}
+.audio-btn:hover { background:rgba(200,144,26,0.3); }
+.audio-info { flex:1; }
+.audio-title { font-size:12px; color:var(--gold-light); }
+.audio-sub { font-size:11px; color:var(--cream-faint); margin-top:2px; }
+/* TODO: ใส่ไฟล์เสียงบรรยายประวัติ: audio_pueng.mp3, audio_guanyin.mp3 เป็นต้น */
+
+/* Action buttons */
+.deity-actions { display:flex; flex-direction:column; gap:10px; padding:0 24px; }
+
+.btn-worship {
+  padding:14px; border:1px solid rgba(200,144,26,0.5);
+  background:linear-gradient(135deg, rgba(200,144,26,0.15), rgba(200,144,26,0.05));
+  color:var(--gold-light); font-family:'Noto Serif Thai',serif;
+  font-size:15px; font-weight:600; border-radius:8px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.3s;
+}
+.btn-worship:hover { background:rgba(200,144,26,0.25); box-shadow:0 0 20px rgba(200,144,26,0.3); }
+
+.btn-donate {
+  padding:14px; border:none;
+  background:linear-gradient(135deg, var(--gold), #a06e10);
+  color:var(--ink); font-family:'Noto Serif Thai',serif;
+  font-size:15px; font-weight:700; border-radius:8px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.3s;
+}
+.btn-donate:hover { filter:brightness(1.15); transform:translateY(-1px); box-shadow:0 4px 20px rgba(200,144,26,0.5); }
+
+.btn-close-panel {
+  margin-top:6px; padding:10px;
+  background:transparent; border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4); font-size:13px; border-radius:8px; cursor:pointer;
+  transition:all 0.2s;
+}
+.btn-close-panel:hover { border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.7); }
+
+/* ============================================================
+   WORSHIP VIDEO MODAL
+   ============================================================ */
+#worship-modal {
+  position:fixed; inset:0; z-index:300;
+  background:rgba(0,0,0,0.9); backdrop-filter:blur(8px);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  padding:20px;
+}
+#worship-modal.open { display:flex; }
+
+.worship-modal-box {
+  width:100%; max-width:460px;
+  background:#0a0200; border:1px solid rgba(200,144,26,0.3);
+  border-radius:16px; overflow:hidden;
+}
+.worship-modal-header {
+  padding:16px 20px; border-bottom:1px solid rgba(200,144,26,0.15);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.worship-modal-title { font-family:'Noto Serif Thai',serif; font-size:16px; color:var(--gold-light); }
+.btn-close-modal {
+  background:transparent; border:none; color:var(--cream-dim);
+  font-size:20px; cursor:pointer; padding:4px 8px; line-height:1;
+}
+
+.worship-video-wrap {
+  width:100%; aspect-ratio:16/9; background:#000;
+  display:flex; align-items:center; justify-content:center; position:relative;
+}
+.worship-video-wrap video { width:100%; height:100%; object-fit:contain; }
+/* NOTE: เปลี่ยน src ของ <video> เป็น worship_pueng.mp4 / worship_guanyin.mp4 เป็นต้น */
+/* NOTE: หรือใช้ YouTube embed แทน <video> ถ้ามี YouTube link */
+
+.worship-placeholder {
+  display:flex; flex-direction:column; align-items:center; gap:12px; color:var(--cream-dim);
+}
+.worship-placeholder .big-icon { font-size:48px; }
+.worship-placeholder p { font-size:13px; text-align:center; line-height:1.8; }
+
+.worship-steps {
+  padding:16px 20px; border-top:1px solid rgba(200,144,26,0.1);
+}
+.worship-steps-title { font-size:12px; color:var(--cream-dim); margin-bottom:10px; }
+.worship-step { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.step-num {
+  width:22px; height:22px; border-radius:50%;
+  border:1px solid var(--gold-dim); color:var(--gold-light);
+  font-size:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.step-text { font-size:13px; color:var(--cream-dim); }
+
+/* ============================================================
+   SCREEN 3: DONATION
+   ============================================================ */
+#screen-donate {
+  z-index:100; background:var(--ink);
+  overflow-y:auto; display:none;
+}
+#screen-donate.active { display:block; }
+
+.donate-wrap {
+  min-height:100%; display:flex; flex-direction:column;
+  align-items:center; padding:24px 20px 40px;
+}
+
+.donate-header {
+  width:100%; max-width:440px; text-align:center; margin-bottom:28px;
+  padding-top:20px;
+}
+.donate-deity-icon { font-size:48px; margin-bottom:10px; }
+.donate-title {
+  font-family:'Noto Serif Thai',serif; font-size:20px; font-weight:700;
+  color:var(--gold-light); margin-bottom:4px;
+}
+.donate-sub { font-size:13px; color:var(--cream-dim); }
+
+.donate-form {
+  width:100%; max-width:440px;
+  background:rgba(255,255,255,0.03); border:1px solid rgba(200,144,26,0.2);
+  border-radius:16px; padding:24px; margin-bottom:20px;
+}
+
+.form-group { margin-bottom:18px; }
+.form-label { font-size:12px; color:var(--cream-dim); margin-bottom:6px; display:block; }
+.form-input {
+  width:100%; padding:12px 16px;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(200,144,26,0.25);
+  border-radius:8px; color:var(--cream); font-size:14px;
+  font-family:'Noto Sans Thai',sans-serif; outline:none;
+  transition:border-color 0.2s;
+}
+.form-input:focus { border-color:var(--gold); }
+.form-input::placeholder { color:var(--cream-faint); }
+textarea.form-input { height:80px; resize:none; }
+
+/* Amount quick pick */
+.amount-chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.amount-chip {
+  padding:6px 16px; border:1px solid rgba(200,144,26,0.3);
+  background:transparent; color:var(--cream-dim); border-radius:20px;
+  font-size:13px; cursor:pointer; transition:all 0.2s;
+  font-family:'Noto Sans Thai',sans-serif;
+}
+.amount-chip:hover, .amount-chip.selected {
+  background:rgba(200,144,26,0.2); border-color:var(--gold); color:var(--gold-light);
+}
+
+/* Payment methods */
+.payment-section { margin-bottom:18px; }
+.payment-label { font-size:12px; color:var(--cream-dim); margin-bottom:10px; display:block; }
+.payment-methods { display:flex; flex-direction:column; gap:8px; }
+.payment-method {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border:1px solid rgba(200,144,26,0.2);
+  border-radius:10px; cursor:pointer; transition:all 0.2s;
+  background:transparent;
+}
+.payment-method:hover { border-color:var(--gold); background:rgba(200,144,26,0.07); }
+.payment-method.selected { border-color:var(--gold); background:rgba(200,144,26,0.12); }
+.payment-method input[type=radio] { accent-color:var(--gold); }
+.payment-method-name { font-size:14px; color:var(--cream); flex:1; }
+.payment-method-icon { font-size:20px; }
+
+/* QR code area */
+#qr-area {
+  display:none; text-align:center; padding:20px;
+  background:rgba(255,255,255,0.03); border:1px solid rgba(200,144,26,0.2);
+  border-radius:12px; margin-top:16px;
+}
+#qr-area.show { display:block; }
+.qr-box {
+  width:180px; height:180px; background:#fff; border-radius:8px;
+  margin:0 auto 12px; display:flex; align-items:center; justify-content:center;
+  font-size:12px; color:#333; text-align:center; padding:10px;
+  /* NOTE: แทนที่ด้วย QR Code จริงของ PromptPay / TrueMoney ของศาลเจ้า */
+  /* ใช้ไลบรารี qrcode.js หรือ API สร้าง QR ได้ */
+}
+.qr-note { font-size:12px; color:var(--cream-dim); line-height:1.8; }
+
+/* Slip upload */
+#slip-section {
+  display:none; margin-top:16px;
+}
+#slip-section.show { display:block; }
+.slip-upload-area {
+  border:2px dashed rgba(200,144,26,0.3); border-radius:12px;
+  padding:24px; text-align:center; cursor:pointer; transition:all 0.2s;
+  background:rgba(200,144,26,0.03);
+}
+.slip-upload-area:hover { border-color:var(--gold); background:rgba(200,144,26,0.07); }
+.slip-upload-area input { display:none; }
+.slip-upload-icon { font-size:32px; margin-bottom:8px; }
+.slip-upload-text { font-size:13px; color:var(--cream-dim); }
+
+#slip-preview { display:none; margin-top:12px; }
+#slip-preview img { width:100%; border-radius:8px; border:1px solid rgba(200,144,26,0.3); }
+#slip-verify-status { margin-top:10px; font-size:13px; text-align:center; min-height:20px; }
+.verify-loading { color:var(--cream-dim); }
+.verify-ok { color:#4CAF50; }
+.verify-fail { color:#F44336; }
+
+.btn-submit-donate {
+  width:100%; padding:15px;
+  background:linear-gradient(135deg, var(--gold), #a06e10);
+  color:var(--ink); font-family:'Noto Serif Thai',serif;
+  font-size:16px; font-weight:700; border:none; border-radius:10px;
+  cursor:pointer; transition:all 0.3s; margin-top:8px;
+}
+.btn-submit-donate:hover { filter:brightness(1.1); transform:translateY(-1px); }
+.btn-submit-donate:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+.btn-back-tour {
+  background:transparent; border:none; color:var(--cream-dim);
+  font-size:13px; cursor:pointer; padding:10px; margin-top:4px;
+}
+
+/* ============================================================
+   SCREEN 4: MERIT CERTIFICATE
+   ============================================================ */
+#screen-cert {
+  z-index:100; background:var(--ink);
+  overflow-y:auto; display:none;
+}
+#screen-cert.active { display:block; }
+
+.cert-wrap {
+  min-height:100%; display:flex; flex-direction:column;
+  align-items:center; padding:24px 20px 40px;
+}
+
+.cert-success-icon {
+  font-size:56px; margin-bottom:16px; margin-top:20px;
+  animation:cert-pop 0.6s cubic-bezier(0.34,1.6,0.64,1);
+}
+@keyframes cert-pop {
+  from { transform:scale(0); opacity:0; }
+  to   { transform:scale(1); opacity:1; }
+}
+.cert-success-title {
+  font-family:'Noto Serif Thai',serif; font-size:20px; font-weight:700;
+  color:var(--gold-light); margin-bottom:4px; text-align:center;
+}
+.cert-success-sub { font-size:13px; color:var(--cream-dim); text-align:center; margin-bottom:28px; }
+
+/* Certificate card */
+.cert-card {
+  width:100%; max-width:400px;
+  background:linear-gradient(160deg, #fdf8ef, #f5e8c0);
+  border:2px solid var(--gold); border-radius:4px;
+  position:relative; overflow:hidden; margin-bottom:24px;
+  box-shadow:0 8px 40px rgba(200,144,26,0.4);
+  /* NOTE: สามารถเพิ่มโลโก้ศาลเจ้าจริงได้โดยเปลี่ยน background-image */
+}
+.cert-corner {
+  position:absolute; font-size:24px; opacity:0.3;
+  top:8px; left:8px;
+}
+.cert-corner.tr { top:8px; left:auto; right:8px; }
+.cert-corner.bl { top:auto; bottom:8px; }
+.cert-corner.br { top:auto; bottom:8px; left:auto; right:8px; }
+
+.cert-border {
+  position:absolute; inset:6px;
+  border:1px solid rgba(200,144,26,0.5); border-radius:2px; pointer-events:none;
+}
+
+.cert-inner { padding:30px 28px; text-align:center; }
+
+.cert-shrine-logo { font-size:36px; margin-bottom:4px; }
+.cert-shrine-name-th {
+  font-family:'Noto Serif Thai',serif; font-size:14px; font-weight:700;
+  color:var(--red); margin-bottom:2px;
+}
+.cert-shrine-name-en { font-size:10px; color:#666; margin-bottom:16px; }
+
+.cert-divider { border:none; border-top:1px solid rgba(200,144,26,0.4); margin:12px 0; }
+
+.cert-label { font-size:10px; color:#888; margin-bottom:2px; }
+.cert-headline {
+  font-family:'Noto Serif Thai',serif; font-size:18px; font-weight:700;
+  color:var(--red-dark); margin-bottom:16px;
+}
+.cert-donor-name {
+  font-family:'Noto Serif Thai',serif; font-size:22px; font-weight:700;
+  color:var(--red); margin-bottom:4px;
+}
+.cert-amount {
+  font-size:14px; color:#444; margin-bottom:4px;
+}
+.cert-deity { font-size:13px; color:#666; margin-bottom:4px; }
+.cert-wish { font-size:12px; color:#777; font-style:italic; margin-bottom:16px; padding:0 10px; line-height:1.7; }
+.cert-date { font-size:11px; color:#999; margin-bottom:16px; }
+
+.cert-seal {
+  width:70px; height:70px; border-radius:50%;
+  border:2px solid rgba(139,26,26,0.4);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 16px; font-size:28px;
+  background:rgba(139,26,26,0.05);
+}
+.cert-signature { font-size:11px; color:#999; }
+
+/* Share buttons */
+.cert-actions { width:100%; max-width:400px; display:flex; flex-direction:column; gap:10px; }
+.btn-share {
+  padding:13px; border-radius:8px; font-size:14px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.2s; font-family:'Noto Sans Thai',sans-serif;
+}
+.btn-share-email {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
+  color:var(--cream);
+}
+.btn-share-email:hover { background:rgba(255,255,255,0.1); }
+.btn-share-download {
+  background:linear-gradient(135deg, var(--gold), #a06e10);
+  border:none; color:var(--ink);
+}
+.btn-share-download:hover { filter:brightness(1.1); }
+.btn-back-tour2 {
+  background:transparent; border:none; color:var(--cream-dim);
+  font-size:13px; cursor:pointer; padding:10px; margin-top:4px;
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.hidden { display:none !important; }
+
+/* Pannellum overrides */
+.pnlm-container { background:#080300 !important; }
+.pnlm-hotspot-base { cursor:pointer !important; }
+div[class*="pnlm-"] .custom-hotspot-wrapper {
+  transform:translate(-50%,-50%);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(200,144,26,0.3); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SCREEN 1: MAP FLY-IN
+     ============================================================ -->
+<div id="screen-map" class="screen active">
+  <div id="mapbox-container"></div>
+
+  <div id="map-overlay">
+    <div class="shrine-emblem">🏮</div>
+    <div class="shrine-name-th">
+      ศาลเจ้าปึงเถ่ากงม่าขอนแก่น<br>
+      <span style="font-size:16px;font-weight:400;color:var(--cream-dim)">สมาคมปึงเถ่ากงม่าขอนแก่น</span>
+    </div>
+    <div class="shrine-name-sub">PUENG THAO KONG MA SHRINE · KHON KAEN</div>
+    <button class="btn-start" onclick="startFlyIn()">✦ เริ่มต้นการเดินทาง ✦</button>
+  </div>
+
+  <div id="fly-in-badge">🌏 กำลังบินไปยังขอนแก่น...</div>
+</div>
+
+<!-- ============================================================
+     SCREEN 2: PANORAMA TOUR
+     ============================================================ -->
+<div id="screen-tour" class="screen">
+  <div id="pannellum-container"></div>
+
+  <!-- HUD top -->
+  <div id="tour-hud">
+    <div class="hud-left">
+      <div class="hud-icon">🏮</div>
+      <div>
+        <div class="hud-title" id="hud-title">ศาลเจ้าปึงเถ่ากงม่าขอนแก่น</div>
+        <div class="hud-sub" id="hud-sub">ลากนิ้วเพื่อมองรอบ 360°</div>
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-back-map" onclick="backToMap()">← แผนที่</button>
+
+  <!-- Scene navigation dots -->
+  <div id="scene-nav">
+    <div class="scene-dot active" onclick="goScene('front')" title="หน้าศาลเจ้า"></div>
+    <div class="scene-dot" onclick="goScene('center')" title="กลางศาลเจ้า"></div>
+    <div class="scene-dot" onclick="goScene('inside')" title="ภายในศาลเจ้า"></div>
+    <div class="scene-dot" onclick="goScene('nanning')" title="สวนหนานหนิง"></div>
+    <div class="scene-dot" onclick="goScene('guanyin_plaza')" title="ลานเจ้าแม่กวนอิม"></div>
+    <span class="scene-dot-label" id="scene-label">หน้าศาลเจ้า</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     DEITY PANEL (ลอยบนทุก screen)
+     ============================================================ -->
+<div id="deity-panel">
+  <div id="deity-backdrop" onclick="closeDeityPanel()"></div>
+  <div id="deity-card">
+    <div class="panel-drag"></div>
+
+    <!-- ภาพองค์เทพ -->
+    <div class="deity-img-wrap" id="deity-img-wrap">
+      <!-- NOTE: เปลี่ยนเป็น <img src="deity_pueng.jpg"> เมื่อมีภาพจริง -->
+      <div class="deity-img-placeholder" id="deity-img-placeholder">
+        <span id="deity-icon-large">🏮</span>
+        <span id="deity-img-label">ภาพองค์เทพ</span>
+      </div>
+    </div>
+
+    <div class="deity-info">
+      <div class="deity-name-th" id="deity-name-th">-</div>
+      <div class="deity-name-zh" id="deity-name-zh">-</div>
+      <div class="deity-wish" id="deity-wish">-</div>
+      <div class="deity-history" id="deity-history">-</div>
+
+      <!-- Audio บรรยายประวัติ -->
+      <!-- NOTE: เปลี่ยน src="" เป็น audio_pueng.mp3 เป็นต้น เมื่อมีไฟล์เสียง -->
+      <div class="deity-audio">
+        <button class="audio-btn" onclick="toggleAudio()" id="audio-btn">▶</button>
+        <div class="audio-info">
+          <div class="audio-title">🔊 ฟังประวัติและบทสวด</div>
+          <div class="audio-sub" id="audio-sub-text">กดเพื่อฟังคำบรรยาย</div>
+          <!-- NOTE: เพิ่ม <audio id="deity-audio-el" src=""></audio> แล้วเชื่อมกับ toggleAudio() -->
+        </div>
+      </div>
+    </div>
+
+    <div class="deity-actions">
+      <button class="btn-worship" onclick="openWorshipModal()">
+        🎬 ดูพิธีไหว้ออนไลน์
+      </button>
+      <button class="btn-donate" onclick="openDonate()">
+        🪙 ร่วมทำบุญถวาย
+      </button>
+      <button class="btn-close-panel" onclick="closeDeityPanel()">✕ ปิด · กลับสู่ Virtual Tour</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WORSHIP VIDEO MODAL
+     ============================================================ -->
+<div id="worship-modal">
+  <div class="worship-modal-box">
+    <div class="worship-modal-header">
+      <div class="worship-modal-title" id="worship-modal-title">พิธีไหว้ออนไลน์</div>
+      <button class="btn-close-modal" onclick="closeWorshipModal()">✕</button>
+    </div>
+
+    <div class="worship-video-wrap">
+      <!-- NOTE: เปลี่ยนเป็น <video src="worship_pueng.mp4" controls></video> -->
+      <!-- NOTE: หรือใช้ YouTube: <iframe src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe> -->
+      <div class="worship-placeholder">
+        <div class="big-icon">🎬</div>
+        <p>วิดีโอพิธีไหว้<br><span style="font-size:11px;color:var(--cream-faint)">[TODO: ใส่ไฟล์วิดีโอ worship_[deity].mp4<br>หรือ YouTube embed link]</span></p>
+      </div>
+    </div>
+
+    <div class="worship-steps">
+      <div class="worship-steps-title">ขั้นตอนการไหว้</div>
+      <div class="worship-step"><div class="step-num">1</div><div class="step-text">จุดธูป 3 ดอก อธิษฐานในใจ</div></div>
+      <div class="worship-step"><div class="step-num">2</div><div class="step-text">ยกธูปขึ้นระดับหน้าผาก ไหว้ 3 ครั้ง</div></div>
+      <div class="worship-step"><div class="step-num">3</div><div class="step-text">ปักธูปลงกระถาง กราบ 3 ครั้ง</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 3: DONATION
+     ============================================================ -->
+<div id="screen-donate" class="screen">
+  <div class="donate-wrap">
+    <button class="btn-back-tour" onclick="closeDonate()">← กลับสู่ Virtual Tour</button>
+
+    <div class="donate-header">
+      <div class="donate-deity-icon" id="donate-deity-icon">🏮</div>
+      <div class="donate-title" id="donate-title">ร่วมทำบุญ</div>
+      <div class="donate-sub" id="donate-sub">ถวายแด่องค์เทพ</div>
+    </div>
+
+    <div class="donate-form">
+      <div class="form-group">
+        <label class="form-label">ชื่อ-นามสกุล ผู้ร่วมทำบุญ</label>
+        <input class="form-input" id="donor-name" type="text" placeholder="กรอกชื่อของท่าน">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">จำนวนเงิน (บาท)</label>
+        <input class="form-input" id="donor-amount" type="number" placeholder="0" min="1">
+        <div class="amount-chips">
+          <button class="amount-chip" onclick="setAmount(20)">20</button>
+          <button class="amount-chip" onclick="setAmount(50)">50</button>
+          <button class="amount-chip" onclick="setAmount(100)">100</button>
+          <button class="amount-chip" onclick="setAmount(200)">200</button>
+          <button class="amount-chip" onclick="setAmount(500)">500</button>
+          <button class="amount-chip" onclick="setAmount(1000)">1,000</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">อธิษฐาน (ไม่บังคับ)</label>
+        <textarea class="form-input" id="donor-wish" placeholder="ขอพร อธิษฐาน..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">อีเมล (สำหรับรับใบอนุโมทนา)</label>
+        <input class="form-input" id="donor-email" type="email" placeholder="email@example.com">
+      </div>
+
+      <!-- Payment methods -->
+      <div class="payment-section">
+        <label class="payment-label">เลือกช่องทางชำระเงิน</label>
+        <div class="payment-methods">
+          <label class="payment-method" id="pm-promptpay">
+            <input type="radio" name="payment" value="promptpay" onchange="selectPayment('promptpay')">
+            <span class="payment-method-icon">📱</span>
+            <span class="payment-method-name">PromptPay</span>
+          </label>
+          <label class="payment-method" id="pm-truemoney">
+            <input type="radio" name="payment" value="truemoney" onchange="selectPayment('truemoney')">
+            <span class="payment-method-icon">💚</span>
+            <span class="payment-method-name">TrueMoney Wallet</span>
+          </label>
+          <!-- NOTE: เพิ่ม Stripe สำหรับต่างประเทศได้ที่นี่ -->
+        </div>
+      </div>
+
+      <!-- QR Code area -->
+      <div id="qr-area">
+        <!-- NOTE: แทนที่ด้วย QR Code จริงของศาลเจ้า PromptPay หมายเลข XXX-XXX-XXXX -->
+        <!-- สามารถใช้ API: https://promptpay.io/[เบอร์โทร]/[จำนวนเงิน].png -->
+        <div class="qr-box">
+          📱 QR Code<br>
+          <span style="font-size:10px">[TODO: ใส่ QR PromptPay<br>ของศาลเจ้าตรงนี้]</span>
+        </div>
+        <div class="qr-note">
+          สแกน QR แล้วโอนจำนวนที่กรอกไว้<br>
+          จากนั้นอัปโหลดสลิปด้านล่าง
+        </div>
+      </div>
+
+      <!-- Slip upload + AI verify -->
+      <div id="slip-section">
+        <div class="form-label" style="margin-top:16px;margin-bottom:8px">อัปโหลดสลิปการโอนเงิน</div>
+        <div class="slip-upload-area" onclick="document.getElementById('slip-file').click()">
+          <input type="file" id="slip-file" accept="image/*" onchange="handleSlipUpload(event)">
+          <div class="slip-upload-icon">📎</div>
+          <div class="slip-upload-text">แตะเพื่ออัปโหลดสลิป<br><span style="font-size:11px;color:var(--cream-faint)">รองรับ JPG, PNG</span></div>
+        </div>
+        <div id="slip-preview">
+          <img id="slip-img" src="" alt="slip">
+        </div>
+        <div id="slip-verify-status"></div>
+        <!-- NOTE: การตรวจสอบสลิปใช้ Claude API (claude-sonnet-4-20250514)
+             ส่งภาพสลิปไปให้ AI อ่าน ชื่อและจำนวนเงิน เทียบกับที่ผู้ใช้กรอก
+             ไม่มีการเก็บภาพสลิปไว้ในระบบ อ่านแล้วทิ้งทันที -->
+      </div>
+
+      <button class="btn-submit-donate" id="btn-submit" onclick="submitDonate()" disabled>
+        ยืนยันการทำบุญ
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 4: MERIT CERTIFICATE
+     ============================================================ -->
+<div id="screen-cert" class="screen">
+  <div class="cert-wrap">
+    <div class="cert-success-icon">✅</div>
+    <div class="cert-success-title">อนุโมทนาบุญ</div>
+    <div class="cert-success-sub">ขออนุโมทนาในกุศลจิตของท่าน สาธุ 🙏</div>
+
+    <!-- Certificate card -->
+    <div class="cert-card" id="cert-card">
+      <div class="cert-corner">🐉</div>
+      <div class="cert-corner tr">🐉</div>
+      <div class="cert-corner bl">🏮</div>
+      <div class="cert-corner br">🏮</div>
+      <div class="cert-border"></div>
+
+      <div class="cert-inner">
+        <!-- NOTE: เพิ่มโลโก้ศาลเจ้าจริงแทน emoji ด้านล่าง -->
+        <div class="cert-shrine-logo">🏮</div>
+        <div class="cert-shrine-name-th">ศาลเจ้าปึงเถ่ากงม่าขอนแก่น</div>
+        <div class="cert-shrine-name-en">Pueng Thao Kong Ma Shrine · Khon Kaen</div>
+
+        <hr class="cert-divider">
+        <div class="cert-label">ใบอนุโมทนาบุญ</div>
+        <div class="cert-headline">บัตรอนุโมทนากุศล</div>
+
+        <div class="cert-label">ผู้ร่วมบุญ</div>
+        <div class="cert-donor-name" id="cert-name">-</div>
+        <div class="cert-amount" id="cert-amount">จำนวน - บาท</div>
+        <div class="cert-deity" id="cert-deity">ถวายแด่ -</div>
+        <div class="cert-wish" id="cert-wish">-</div>
+        <div class="cert-date" id="cert-date">-</div>
+
+        <div class="cert-seal">🔱</div>
+        <!-- NOTE: เปลี่ยน 🔱 เป็นตราประทับ/โลโก้จริงของศาลเจ้า -->
+        <div class="cert-signature">คณะกรรมการสมาคมปึงเถ่ากงม่าขอนแก่น</div>
+      </div>
+    </div>
+
+    <div class="cert-actions">
+      <button class="btn-share btn-share-email" onclick="sendEmail()">
+        📧 ส่งใบอนุโมทนาทางอีเมล
+      </button>
+      <!-- NOTE: เพิ่มปุ่ม LINE ได้ที่นี่: ใช้ LINE Notify หรือ LINE Share URL -->
+      <button class="btn-share btn-share-download" onclick="downloadCert()">
+        💾 ดาวน์โหลดใบอนุโมทนา (PNG)
+        <!-- NOTE: ใช้ html2canvas แปลง #cert-card เป็น PNG ดาวน์โหลด -->
+      </button>
+      <button class="btn-back-tour2" onclick="backToTourFromCert()">
+        ← กลับสู่ Virtual Tour
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ============================================================
+   CONFIG — แก้ค่าเหล่านี้ให้ตรงกับข้อมูลจริง
+   ============================================================ */
+const CONFIG = {
+  // NOTE: ใส่ Mapbox Access Token ของคุณที่นี่
+  // สมัครฟรีที่ mapbox.com แล้ว copy token จาก dashboard
+  MAPBOX_TOKEN: 'YOUR_MAPBOX_TOKEN_HERE',
+
+  // NOTE: ใส่ Anthropic API Key สำหรับอ่านสลิป
+  // สมัครที่ console.anthropic.com
+  ANTHROPIC_API_KEY: 'YOUR_ANTHROPIC_API_KEY_HERE',
+
+  // พิกัดศาลเจ้า ขอนแก่น
+  SHRINE_LNG: 102.840091,
+  SHRINE_LAT: 16.419801,
+};
+
+/* ============================================================
+   DEITY DATA
+   ============================================================ */
+const DEITIES = {
+  fadan: {
+    nameTH: 'ศาลฟ้าดิน (เทพฟ้าดิน)',
+    nameZH: '天地神明 · Tiān Dì Shén Míng',
+    icon: '☯️',
+    imgFile: 'deity_fadan.jpg',      // TODO: ใส่ภาพจริง
+    audioFile: 'audio_fadan.mp3',    // TODO: ใส่ไฟล์เสียง
+    videoFile: 'worship_fadan.mp4',  // TODO: ใส่วิดีโอพิธีไหว้
+    wish: '⭐ ขอพรด้านชีวิต ความโชคดี ความสุข',
+    history: `เทพฟ้าดิน หรือ "อ๋องเทียนฮู้ตี้" คือเทพเจ้าสูงสุดแห่งจักรวาลในความเชื่อของชาวจีน 
+    เป็นตัวแทนของพลังฟ้าและดิน ผู้ปกครองสรรพสิ่งทั้งปวง 
+    การบูชาเทพฟ้าดินเป็นประเพณีโบราณที่สืบทอดมานับพันปี 
+    เชื่อกันว่าท่านดูแลทุกชีวิตบนโลกและประทานพรแก่ผู้มีจิตใจดีงาม
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  },
+  pueng: {
+    nameTH: 'องค์ปึงเถ่ากงม่า',
+    nameZH: '本頭公媽 · Běn Tóu Gōng Mā',
+    icon: '👴',
+    imgFile: 'deity_pueng.jpg',
+    audioFile: 'audio_pueng.mp3',
+    videoFile: 'worship_pueng.mp4',
+    wish: '💰 ขอพรด้านโชคลาภ ค้าขาย',
+    history: `องค์ปึงเถ่ากงม่า คือเทพผู้ปกปักรักษาชุมชน เป็นเทพที่ชาวจีนฮกเกี้ยนเคารพนับถือสูงสุด 
+    ท่านเป็นตัวแทนของบรรพบุรุษที่มีคุณธรรมสูงจนได้รับการยกย่องเป็นเทพ 
+    เชื่อว่าท่านปกปักษ์รักษาชุมชนและลูกหลาน ประทานความเจริญรุ่งเรืองแก่ผู้บูชา
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  },
+  thapthim: {
+    nameTH: 'เจ้าแม่ทับทิม',
+    nameZH: '妈祖 · Māzǔ',
+    icon: '🔴',
+    imgFile: 'deity_thapthim.jpg',
+    audioFile: 'audio_thapthim.mp3',
+    videoFile: 'worship_thapthim.mp4',
+    wish: '🌊 ขอพรด้านความปลอดภัย การเดินทาง',
+    history: `เจ้าแม่ทับทิม หรือ "มาจู่" เป็นเทพีแห่งท้องทะเล ผู้ปกปักรักษาชาวเรือและนักเดินทาง 
+    ตามตำนานท่านเป็นหญิงสาวชาวฮกเกี้ยนผู้มีจิตใจเมตตาและพลังพิเศษ 
+    หลังจากสิ้นชีพท่านได้รับการยกย่องเป็นเทพีผู้พิทักษ์
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  },
+  caishen: {
+    nameTH: 'องค์ไฉ่ซิงเอี๊ย (เทพเจ้าแห่งโชคลาภ)',
+    nameZH: '財神爺 · Cái Shén Yé',
+    icon: '💛',
+    imgFile: 'deity_caishen.jpg',
+    audioFile: 'audio_caishen.mp3',
+    videoFile: 'worship_caishen.mp4',
+    wish: '💵 ขอพรด้านการเงิน ธุรกิจ',
+    history: `ไฉ่ซิงเอี๊ย คือเทพเจ้าแห่งความมั่งคั่งและโชคลาภ เป็นที่เคารพบูชาของพ่อค้าและนักธุรกิจ 
+    ท่านสวมชุดสีทองถือแท่งทองและถุงทรัพย์สมบัติ 
+    การบูชาท่านนิยมทำในช่วงตรุษจีนและวันที่ 5 ของเดือนจีน
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  },
+  tizhu: {
+    nameTH: 'ศาลเจ้าตี่จู้เอี๊ย',
+    nameZH: '地主爺 · Dì Zhǔ Yé',
+    icon: '🏠',
+    imgFile: 'deity_tizhu.jpg',
+    audioFile: 'audio_tizhu.mp3',
+    videoFile: 'worship_tizhu.mp4',
+    wish: '🏡 ขอพรด้านที่อยู่อาศัย ที่ดิน',
+    history: `ตี่จู้เอี๊ย คือเทพเจ้าแห่งพื้นดินและที่อยู่อาศัย ผู้ปกปักรักษาบ้านเรือนและที่ดิน 
+    ชาวจีนนิยมตั้งศาลตี่จู้ไว้ที่บ้านและกิจการ เพื่อขอความคุ้มครองและความมั่งคั่ง
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  },
+  guanyin: {
+    nameTH: 'เจ้าแม่กวนอิม',
+    nameZH: '觀世音菩薩 · Guān Shì Yīn Pú Sà',
+    icon: '🪷',
+    imgFile: 'deity_guanyin.jpg',
+    audioFile: 'audio_guanyin.mp3',
+    videoFile: 'worship_guanyin.mp4',
+    wish: '💗 ขอพรด้านความเมตตา บุตร สุขภาพ',
+    history: `เจ้าแม่กวนอิม พระโพธิสัตว์แห่งความเมตตากรุณา ท่านสดับฟังเสียงร้องทุกข์ของสรรพสัตว์ 
+    และช่วยเหลือผู้ที่ตกทุกข์ได้ยาก เป็นที่เคารพทั้งในพุทธศาสนาและความเชื่อพื้นบ้านจีน 
+    ผู้บูชาท่านมักขอพรด้านบุตร สุขภาพ และความสุขในครอบครัว
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  },
+  naja: {
+    nameTH: 'องค์นาจา (เนจา)',
+    nameZH: '哪吒 · Nǎ Zhā',
+    icon: '🔥',
+    imgFile: 'deity_naja.jpg',
+    audioFile: 'audio_naja.mp3',
+    videoFile: 'worship_naja.mp4',
+    wish: '🛡️ ขอพรด้านความคุ้มครอง ปัดเป่าทุกข์ภัย',
+    history: `นาจา หรือ เนจา เป็นเทพเจ้าวีรบุรุษในตำนานจีน ท่านมีพลังอันยิ่งใหญ่และจิตใจกล้าหาญ 
+    ถือกงล้อไฟ ลูกไฟ และหอก เป็นอาวุธ ท่านเป็นผู้ปกป้องปัดเป่าสิ่งชั่วร้าย 
+    และเป็นที่รักของเด็กๆ ในฐานะเทพเจ้าหนุ่มน้อย
+    
+    // NOTE: เพิ่มประวัติเต็มได้ที่นี่`
+  }
+};
+
+/* ============================================================
+   SCENE DATA
+   ============================================================ */
+const SCENES = {
+  front: {
+    label: 'หน้าศาลเจ้า',
+    pano: 'pano_front.jpg',     // TODO: ใส่ภาพ panorama จริง
+    dotIndex: 0,
+    hotspots: [
+      {
+        pitch: -5, yaw: 0,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">➡️</div>',
+        tooltip: 'เข้าสู่ศาลเจ้า',
+        clickFn: () => goScene('center')
+      }
+    ]
+  },
+  center: {
+    label: 'กลางศาลเจ้า (ลาน)',
+    pano: 'pano_center.jpg',    // TODO: ใส่ภาพ panorama จริง
+    dotIndex: 1,
+    hotspots: [
+      {
+        pitch: -5, yaw: -30,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">⬅️</div>',
+        tooltip: 'กลับประตูหน้า',
+        clickFn: () => goScene('front')
+      },
+      {
+        pitch: -5, yaw: 60,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">🚶</div>',
+        tooltip: 'เข้าภายในศาลเจ้า',
+        clickFn: () => goScene('inside')
+      },
+      {
+        pitch: -5, yaw: 150,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">🌳</div>',
+        tooltip: 'สวนหนานหนิง',
+        clickFn: () => goScene('nanning')
+      },
+      // Deity hotspots ในลานกลาง
+      {
+        pitch: 0, yaw: 30,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>☯️</div>',
+        tooltip: 'ศาลฟ้าดิน',
+        clickFn: () => openDeityPanel('fadan')
+      },
+      {
+        pitch: -10, yaw: 90,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>🏠</div>',
+        tooltip: 'ศาลตี่จู้เอี๊ย',
+        clickFn: () => openDeityPanel('tizhu')
+      },
+      {
+        pitch: -5, yaw: -90,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">🏛️</div>',
+        tooltip: 'ศาลาเอนกประสงค์',
+        clickFn: () => goScene('hall')
+      }
+    ]
+  },
+  inside: {
+    label: 'ภายในศาลเจ้า',
+    pano: 'pano_inside.jpg',    // TODO: ถ่ายเพิ่มเติม — ยังไม่มีภาพ
+    dotIndex: 2,
+    hotspots: [
+      {
+        pitch: -5, yaw: 180,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">⬅️</div>',
+        tooltip: 'กลับลานกลาง',
+        clickFn: () => goScene('center')
+      },
+      {
+        pitch: 5, yaw: 0,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>👴</div>',
+        tooltip: 'องค์ปึงเถ่ากงม่า',
+        clickFn: () => openDeityPanel('pueng')
+      },
+      {
+        pitch: 5, yaw: -40,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>🔴</div>',
+        tooltip: 'เจ้าแม่ทับทิม',
+        clickFn: () => openDeityPanel('thapthim')
+      },
+      {
+        pitch: 5, yaw: 40,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>💛</div>',
+        tooltip: 'องค์ไฉ่ซิงเอี๊ย',
+        clickFn: () => openDeityPanel('caishen')
+      }
+    ]
+  },
+  hall: {
+    label: 'ศาลาเอนกประสงค์',
+    pano: 'pano_hall.jpg',      // TODO: ใส่ภาพ panorama จริง
+    dotIndex: 2,
+    hotspots: [
+      {
+        pitch: -5, yaw: 180,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">⬅️</div>',
+        tooltip: 'กลับลานกลาง',
+        clickFn: () => goScene('center')
+      }
+    ]
+  },
+  nanning: {
+    label: 'สวนหนานหนิง',
+    pano: 'pano_nanning.jpg',   // TODO: ใส่ภาพ panorama จริง
+    dotIndex: 3,
+    hotspots: [
+      {
+        pitch: -5, yaw: 180,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">⬅️</div>',
+        tooltip: 'กลับศาลเจ้า',
+        clickFn: () => goScene('center')
+      },
+      {
+        pitch: -5, yaw: 0,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">➡️</div>',
+        tooltip: 'ลานเจ้าแม่กวนอิม',
+        clickFn: () => goScene('guanyin_plaza')
+      }
+    ]
+  },
+  guanyin_plaza: {
+    label: 'ลานเจ้าแม่กวนอิม',
+    pano: 'pano_guanyin_plaza.jpg', // TODO: ใส่ภาพ panorama จริง
+    dotIndex: 4,
+    hotspots: [
+      {
+        pitch: -5, yaw: 180,
+        cssClass: 'custom-hotspot hotspot-nav',
+        innerHTML: '<div class="ch">⬅️</div>',
+        tooltip: 'กลับสวนหนานหนิง',
+        clickFn: () => goScene('nanning')
+      },
+      {
+        pitch: 5, yaw: 0,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>🪷</div>',
+        tooltip: 'เจ้าแม่กวนอิม',
+        clickFn: () => openDeityPanel('guanyin')
+      },
+      {
+        pitch: 5, yaw: 60,
+        cssClass: 'custom-hotspot',
+        innerHTML: '<div>🔥</div>',
+        tooltip: 'องค์นาจา',
+        clickFn: () => openDeityPanel('naja')
+      }
+    ]
+  }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let map = null;
+let viewer = null;
+let currentScene = 'front';
+let currentDeity = null;
+let slipVerified = false;
+let slipBase64 = null;
+
+/* ============================================================
+   SCREEN 1: MAP FLY-IN
+   ============================================================ */
+function startFlyIn() {
+  // ถ้าไม่มี Mapbox token ให้ข้ามไปทัวร์เลย
+  if (CONFIG.MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
+    enterTour();
+    return;
+  }
+
+  mapboxgl.accessToken = CONFIG.MAPBOX_TOKEN;
+  map = new mapboxgl.Map({
+    container: 'mapbox-container',
+    style: 'mapbox://styles/mapbox/satellite-streets-v12',
+    center: [100, 15],
+    zoom: 3, pitch: 0, bearing: 0, antialias: true
+  });
+
+  const overlay = document.getElementById('map-overlay');
+  const badge = document.getElementById('fly-in-badge');
+  overlay.classList.add('fade-out');
+  badge.style.display = 'block';
+
+  map.on('load', () => {
+    // บินลงมา step 1
+    setTimeout(() => {
+      map.flyTo({ center:[CONFIG.SHRINE_LNG, CONFIG.SHRINE_LAT], zoom:10, pitch:30, bearing:0, duration:3000, essential:true });
+    }, 500);
+    // step 2
+    setTimeout(() => {
+      badge.textContent = '🏮 กำลังเข้าใกล้ศาลเจ้า...';
+      map.flyTo({ center:[CONFIG.SHRINE_LNG, CONFIG.SHRINE_LAT], zoom:16, pitch:60, bearing:-20, duration:3500, essential:true });
+    }, 3800);
+    // ถึงแล้ว
+    setTimeout(() => {
+      badge.textContent = '✨ มาถึงศาลเจ้าปึงเถ่ากงม่าขอนแก่น';
+      const el = document.createElement('div');
+      el.innerHTML = '🏮';
+      el.style.cssText = 'font-size:32px;animation:pulse-m 2s ease-in-out infinite;';
+      document.head.insertAdjacentHTML('beforeend','<style>@keyframes pulse-m{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}</style>');
+      new mapboxgl.Marker(el).setLngLat([CONFIG.SHRINE_LNG, CONFIG.SHRINE_LAT]).addTo(map);
+
+      setTimeout(enterTour, 1500);
+    }, 8000);
+  });
+}
+
+function enterTour() {
+  showScreen('screen-tour');
+  goScene('front');
+}
+
+function backToMap() {
+  if (viewer) { viewer.destroy(); viewer = null; }
+  showScreen('screen-map');
+}
+
+/* ============================================================
+   SCREEN 2: PANORAMA TOUR
+   ============================================================ */
+function goScene(sceneId) {
+  const scene = SCENES[sceneId];
+  if (!scene) return;
+  currentScene = sceneId;
+
+  document.getElementById('hud-title').textContent = 'ศาลเจ้าปึงเถ่ากงม่าขอนแก่น';
+  document.getElementById('hud-sub').textContent = scene.label + ' · ลากนิ้วเพื่อมองรอบ 360°';
+  document.getElementById('scene-label').textContent = scene.label;
+
+  // Update dots
+  const dots = document.querySelectorAll('.scene-dot');
+  dots.forEach((d,i) => d.classList.toggle('active', i === scene.dotIndex));
+
+  if (viewer) { viewer.destroy(); viewer = null; }
+
+  const hotspots = scene.hotspots.map(h => ({
+    pitch: h.pitch,
+    yaw: h.yaw,
+    cssClass: h.cssClass,
+    innerHTML: h.innerHTML,
+    tooltip: h.tooltip,
+    clickHandlerFunc: h.clickFn
+  }));
+
+  viewer = pannellum.viewer('pannellum-container', {
+    type: 'equirectangular',
+    panorama: scene.pano,
+    autoLoad: true,
+    autoRotate: -1.5,
+    autoRotateInactivityDelay: 4000,
+    showZoomCtrl: false,
+    showFullscreenCtrl: false,
+    mouseZoom: true,
+    hfov: 100,
+    hotSpots: hotspots,
+    strings: {
+      loadButtonLabel: 'แตะเพื่อเริ่มชม',
+      loadingLabel: 'กำลังโหลด...'
+    }
+  });
+}
+
+/* ============================================================
+   DEITY PANEL
+   ============================================================ */
+function openDeityPanel(deityId) {
+  const d = DEITIES[deityId];
+  if (!d) return;
+  currentDeity = deityId;
+
+  document.getElementById('deity-name-th').textContent = d.nameTH;
+  document.getElementById('deity-name-zh').textContent = d.nameZH;
+  document.getElementById('deity-wish').textContent = d.wish;
+  document.getElementById('deity-history').textContent = d.history;
+  document.getElementById('deity-icon-large').textContent = d.icon;
+  document.getElementById('deity-img-label').textContent = d.nameTH;
+  document.getElementById('worship-modal-title').textContent = 'พิธีไหว้ · ' + d.nameTH;
+
+  const panel = document.getElementById('deity-panel');
+  const card = document.getElementById('deity-card');
+  panel.classList.add('open');
+  setTimeout(() => card.classList.add('slide-in'), 10);
+}
+
+function closeDeityPanel() {
+  const panel = document.getElementById('deity-panel');
+  const card = document.getElementById('deity-card');
+  card.classList.remove('slide-in');
+  setTimeout(() => panel.classList.remove('open'), 500);
+}
+
+/* ============================================================
+   WORSHIP MODAL
+   ============================================================ */
+function openWorshipModal() {
+  document.getElementById('worship-modal').classList.add('open');
+}
+function closeWorshipModal() {
+  document.getElementById('worship-modal').classList.remove('open');
+}
+
+/* ============================================================
+   AUDIO (placeholder)
+   ============================================================ */
+function toggleAudio() {
+  const btn = document.getElementById('audio-btn');
+  const sub = document.getElementById('audio-sub-text');
+  // NOTE: เชื่อม <audio id="deity-audio-el"> และ togglePlay จริงๆ ได้ที่นี่
+  // ตอนนี้เป็น placeholder
+  btn.textContent = btn.textContent === '▶' ? '⏸' : '▶';
+  sub.textContent = btn.textContent === '⏸' ? 'กำลังเล่น...' : 'กดเพื่อฟังคำบรรยาย';
+}
+
+/* ============================================================
+   SCREEN 3: DONATION
+   ============================================================ */
+function openDonate() {
+  closeDeityPanel();
+  const d = DEITIES[currentDeity] || {};
+  document.getElementById('donate-deity-icon').textContent = d.icon || '🏮';
+  document.getElementById('donate-title').textContent = 'ร่วมทำบุญ · ' + (d.nameTH || '');
+  document.getElementById('donate-sub').textContent = 'ถวายแด่' + (d.nameTH || 'องค์เทพ');
+
+  slipVerified = false;
+  slipBase64 = null;
+  document.getElementById('slip-verify-status').textContent = '';
+  document.getElementById('slip-preview').style.display = 'none';
+  document.getElementById('qr-area').classList.remove('show');
+  document.getElementById('slip-section').classList.remove('show');
+  document.getElementById('btn-submit').disabled = true;
+
+  // reset payment
+  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('input[name=payment]').forEach(el => el.checked = false);
+
+  showScreen('screen-donate');
+}
+
+function closeDonate() {
+  showScreen('screen-tour');
+}
+
+function setAmount(val) {
+  document.getElementById('donor-amount').value = val;
+  document.querySelectorAll('.amount-chip').forEach(c => {
+    c.classList.toggle('selected', parseInt(c.textContent.replace(',','')) === val);
+  });
+}
+
+function selectPayment(method) {
+  document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+  document.getElementById('pm-' + method).classList.add('selected');
+  document.getElementById('qr-area').classList.add('show');
+  document.getElementById('slip-section').classList.add('show');
+}
+
+/* Slip upload + Claude AI verify */
+async function handleSlipUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Preview
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result.split(',')[1];
+    slipBase64 = base64;
+
+    document.getElementById('slip-img').src = e.target.result;
+    document.getElementById('slip-preview').style.display = 'block';
+
+    const statusEl = document.getElementById('slip-verify-status');
+
+    // ถ้ายังไม่มี API key จริง ข้ามการตรวจสอบ
+    if (CONFIG.ANTHROPIC_API_KEY === 'YOUR_ANTHROPIC_API_KEY_HERE') {
+      statusEl.className = 'slip-verify-status verify-ok';
+      statusEl.textContent = '✓ [Demo] รับสลิปแล้ว กรุณาใส่ API Key จริงเพื่อตรวจสอบ';
+      slipVerified = true;
+      document.getElementById('btn-submit').disabled = false;
+      return;
+    }
+
+    // AI อ่านสลิป
+    statusEl.className = 'slip-verify-status verify-loading';
+    statusEl.textContent = '⏳ กำลังตรวจสอบสลิป...';
+
+    const name = document.getElementById('donor-name').value;
+    const amount = document.getElementById('donor-amount').value;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': CONFIG.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          messages: [{
+            role: 'user',
+            content: [
+              {
+                type: 'image',
+                source: { type: 'base64', media_type: file.type, data: base64 }
+              },
+              {
+                type: 'text',
+                text: `นี่คือสลิปการโอนเงิน กรุณาตรวจสอบว่า:
+1. จำนวนเงินในสลิปตรงกับ "${amount}" บาท หรือไม่
+2. มีชื่อผู้โอนที่ใกล้เคียงกับ "${name}" หรือไม่
+
+ตอบเป็น JSON เท่านั้น: {"amountMatch": true/false, "nameMatch": true/false, "amountFound": "จำนวนที่พบ", "nameFound": "ชื่อที่พบ"}`
+              }
+            ]
+          }]
+        })
+      });
+
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '{}';
+      const result = JSON.parse(text.replace(/```json|```/g,'').trim());
+
+      if (result.amountMatch) {
+        statusEl.className = 'slip-verify-status verify-ok';
+        statusEl.textContent = `✅ ตรวจสอบสำเร็จ — พบยอด ${result.amountFound} บาท`;
+        slipVerified = true;
+        document.getElementById('btn-submit').disabled = false;
+      } else {
+        statusEl.className = 'slip-verify-status verify-fail';
+        statusEl.textContent = `❌ ยอดไม่ตรงกัน — พบ ${result.amountFound || '-'} บาท (ต้องการ ${amount} บาท)`;
+        slipVerified = false;
+      }
+    } catch(err) {
+      statusEl.className = 'slip-verify-status verify-ok';
+      statusEl.textContent = '✓ รับสลิปแล้ว (ข้ามการตรวจสอบ)';
+      slipVerified = true;
+      document.getElementById('btn-submit').disabled = false;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitDonate() {
+  const name = document.getElementById('donor-name').value.trim();
+  const amount = document.getElementById('donor-amount').value;
+  const wish = document.getElementById('donor-wish').value.trim();
+  const email = document.getElementById('donor-email').value.trim();
+
+  if (!name || !amount) {
+    alert('กรุณากรอกชื่อและจำนวนเงิน');
+    return;
+  }
+
+  showCertificate(name, amount, wish, email);
+}
+
+/* ============================================================
+   SCREEN 4: MERIT CERTIFICATE
+   ============================================================ */
+function showCertificate(name, amount, wish, email) {
+  const d = DEITIES[currentDeity] || {};
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('th-TH', {
+    year:'numeric', month:'long', day:'numeric'
+  });
+
+  document.getElementById('cert-name').textContent = name;
+  document.getElementById('cert-amount').textContent = `จำนวน ${parseInt(amount).toLocaleString()} บาท`;
+  document.getElementById('cert-deity').textContent = 'ถวายแด่ ' + (d.nameTH || 'องค์เทพ');
+  document.getElementById('cert-wish').textContent = wish || 'ขอให้มีความสุข สุขภาพดี เจริญรุ่งเรือง';
+  document.getElementById('cert-date').textContent = 'วันที่ ' + dateStr;
+
+  showScreen('screen-cert');
+}
+
+function sendEmail() {
+  const email = document.getElementById('donor-email').value.trim();
+  if (!email) { alert('กรุณากรอกอีเมลในขั้นตอนทำบุญ'); return; }
+  // NOTE: ส่งอีเมลจริงได้โดยใช้ EmailJS หรือ backend
+  // emailjs.send(...) หรือ fetch POST ไปยัง server
+  alert(`📧 จะส่งใบอนุโมทนาไปที่ ${email}\n\n[TODO: เชื่อม EmailJS หรือ backend สำหรับส่งอีเมลจริง]`);
+}
+
+function downloadCert() {
+  // NOTE: ใช้ html2canvas ดาวน์โหลดเป็น PNG
+  // ติดตั้ง: <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  // แล้วเรียก:
+  // html2canvas(document.getElementById('cert-card')).then(canvas => {
+  //   const link = document.createElement('a');
+  //   link.download = 'ใบอนุโมทนาบุญ.png';
+  //   link.href = canvas.toDataURL();
+  //   link.click();
+  // });
+  alert('💾 [TODO: เพิ่ม html2canvas เพื่อดาวน์โหลดใบอนุโมทนาเป็น PNG]');
+}
+
+function backToTourFromCert() {
+  showScreen('screen-tour');
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+
+</body>
+</html>
