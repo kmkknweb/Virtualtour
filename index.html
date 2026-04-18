@@ -480,28 +480,39 @@ textarea.form-input{height:65px;resize:none;}
           </label>
         </div>
       </div>
+
+     
       <div id="qr-area">
         <!-- TODO: เปลี่ยน src เป็น images/qr_promptpay.png เมื่อมี QR จริง -->
-        <img class="qr-img" src="images/qr_promptpay.png" alt="QR PromptPay"
+        <img class="qr-img" id="qr-real" src="images/qr_promptpay.png" alt="QR PromptPay"
           onerror="this.outerHTML='<div class=\'qr-img\' style=\'background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333;text-align:center;padding:10px;\'>📱 TODO:<br>ใส่ images/qr_promptpay.png</div>'">
         <div class="qr-note">สแกน QR แล้วโอนตามจำนวนที่กรอก</div>
+
+        <button class="btn-save-qr" id="btn-save-qr">💾 บันทึก QR</button>
+
         <div class="account-copy-box">
           <span class="account-number" id="account-display">-</span>
           <button class="btn-copy-account" id="btn-copy-account">📋 Copy</button>
         </div>
-        <!-- TODO: ชื่อบัญชีและธนาคาร แก้ใน CONFIG.BANK_NAME และ CONFIG.BANK_HOLDER -->
+
         <div style="font-size:11px;color:var(--white-faint);margin-top:6px;text-align:center" id="bank-info-display"></div>
       </div>
+
       <div id="slip-section">
         <div class="form-label" style="margin-top:14px;margin-bottom:6px">อัปโหลดสลิปการโอนเงิน</div>
-        <div class="slip-upload-area" id="slip-upload-area">
-          <input type="file" id="slip-file" accept="image/*">
+
+        <label class="slip-upload-area" id="slip-upload-area" for="slip-file">
+          <input type="file" id="slip-file" accept="image/*" hidden>
           <div class="slip-upload-icon">📎</div>
           <div class="slip-upload-text">แตะเพื่ออัปโหลดสลิป<br><span style="font-size:11px;opacity:.6">รองรับ JPG, PNG</span></div>
-        </div>
+        </label>
+
         <div id="slip-preview"><img id="slip-img" src="" alt="slip"></div>
         <div id="slip-verify-status"></div>
       </div>
+
+
+     
       <button class="btn-submit-donate" id="btn-submit" disabled>ยืนยันการทำบุญ</button>
     </div>
   </div>
@@ -949,31 +960,45 @@ document.getElementById('btn-copy-account').addEventListener('click',()=>{
     setTimeout(()=>btn.textContent='📋 Copy',2000);
   });
 });
-
 // บันทึกรูป QR
-document.getElementById('btn-save-qr').addEventListener('click',()=>{
-  const qrImg=document.getElementById('qr-test')||document.getElementById('qr-real');
-  if(!qrImg) return;
-  const link=document.createElement('a');
-  link.download='QR-PromptPay-ศาลเจ้าปึงเถ่ากงม่า.png';
-  link.href=qrImg.src;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-});
-document.getElementById('slip-upload-area').addEventListener('click',()=>document.getElementById('slip-file').click());
-document.getElementById('slip-file').addEventListener('change',e=>{
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    document.getElementById('slip-img').src=ev.target.result;
-    document.getElementById('slip-preview').style.display='block';
-    const st=document.getElementById('slip-verify-status');
-    st.className='verify-ok';st.textContent='✅ รับสลิปแล้ว กดยืนยันได้เลยครับ';
-    document.getElementById('btn-submit').disabled=false;
+const saveQrBtn = document.getElementById('btn-save-qr');
+if (saveQrBtn) {
+  saveQrBtn.addEventListener('click', () => {
+    const qrImg = document.getElementById('qr-real') || document.querySelector('#qr-area img.qr-img');
+    if (!qrImg || !qrImg.src) return;
+
+    const link = document.createElement('a');
+    link.download = 'QR-PromptPay-ศาลเจ้าปึงเถ่ากงม่า.png';
+    link.href = qrImg.src;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+// อัปโหลดสลิป
+document.getElementById('slip-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('slip-img').src = ev.target.result;
+    document.getElementById('slip-preview').style.display = 'block';
+
+    const st = document.getElementById('slip-verify-status');
+    st.className = 'verify-ok';
+    st.textContent = '✅ รับสลิปแล้ว กดยืนยันได้เลยครับ';
+
+    document.getElementById('btn-submit').disabled = false;
   };
   reader.readAsDataURL(file);
 });
+
+
+
+
+                            
 document.getElementById('btn-submit').addEventListener('click',()=>{
   const name=document.getElementById('donor-name').value.trim();
   const amount=document.getElementById('donor-amount').value;
