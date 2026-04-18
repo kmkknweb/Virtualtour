@@ -430,7 +430,7 @@ const DEITIES = {
 /* SCENES */
 const SCENES = {
   front:         { label:'หน้าศาลเจ้า', pano:'pano_front.jpg', dotIndex:0, hotspots:[
-    { pitch:-5, yaw:180,   nav:true,  icon:'➡️', tip:'เข้าสู่ศาลเจ้า',     action:()=>goScene('center') }
+    { pitch:-5, yaw:185,   nav:true,  icon:'➡️', tip:'เข้าสู่ศาลเจ้า',     action:()=>goScene('center') }
   ]},
   center:        { label:'กลางศาลเจ้า (ลาน)', pano:'pano_center.jpg', dotIndex:1, hotspots:[
     { pitch:-5, yaw:-30, nav:true,  icon:'⬅️', tip:'กลับประตูหน้า',       action:()=>goScene('front') },
@@ -507,7 +507,7 @@ function goScene(id){
     type:'equirectangular', panorama:sc.pano,
     autoLoad:true, autoRotate:-1.5, autoRotateInactivityDelay:4000,
     showZoomCtrl:false, showFullscreenCtrl:false, mouseZoom:true,hfov: 100,
-  vaov: 70,       // ← เพิ่มตรงนี้ (ลดมุมมองแนวตั้ง)
+  vaov: 80,       // ← เพิ่มตรงนี้ (ลดมุมมองแนวตั้ง)
   vOffset: -10,   // ← เพิ่มตรงนี้ (เลื่อนมุมมองลงหน่อย)
   pitch: 0,       // ← เพิ่มตรงนี้ (เริ่มมองตรงๆ)
     hotSpots: sc.hotspots.map(h=>({
