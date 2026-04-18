@@ -692,7 +692,7 @@ const SCENES = {
     label:'ลานเจ้าแม่กวนอิม', pano:'pano/pano_guanyin_plaza.jpg', dotIndex:4, defaultYaw:-180,
     hotspots:[
      
-      {pitch:-5,yaw:-160,nav:true, icon:'🚪',tip:'กลับสวนหนานหนิง', action:()=>goScene('nanning')},
+      {pitch:-5,yaw:-220,nav:true, icon:'🚪',tip:'กลับสวนหนานหนิง', action:()=>goScene('nanning')},
       {pitch:-5,yaw:-150,nav:false,icon:'🪷',tip:'เจ้าแม่กวนอิม',action:()=>openDeityPanel('guanyin')},
       {pitch:-5,yaw:110,  nav:false,icon:'🔥',tip:'องค์นาจา',      action:()=>openDeityPanel('naja')},
     ]
@@ -928,7 +928,7 @@ document.getElementById('btn-donate').addEventListener('click',openDonate);
 function openDonate(){
   closeDeityPanel();
   const d=DEITIES[currentDeity]||{};
-  document.getElementById('donate-deity-icon').textContent=d.icon||'🏮';
+  document.getElementById('donate-deity-icon').textContent=d.icon||'';
   document.getElementById('donate-title').textContent='ร่วมทำบุญ · '+(d.nameTH||'');
   document.getElementById('donate-sub').textContent='ถวายแด่'+(d.nameTH||'องค์เทพ');
   document.getElementById('btn-submit').disabled=true;
