@@ -339,6 +339,21 @@ textarea.form-input{height:65px;resize:none;}
 
 <audio id="bg-audio" src="audio/bg_audio.mp3" loop preload="auto"></audio>
 <div id="stars"></div>
+<!-- SCREEN 0: INTRO -->
+<div id="screen-intro" class="screen active">
+  <video id="intro-video" autoplay muted playsinline
+    style="width:100%;height:100%;object-fit:cover;">
+    <source src="video/intro.mp4" type="video/mp4">
+  </video>
+
+  <button onclick="skipIntro()" style="
+    position:absolute;top:20px;right:20px;
+    background:rgba(0,0,0,0.5);
+    color:#fff;border:none;padding:8px 16px;
+    border-radius:20px;
+  ">ข้าม</button>
+</div>
+
 
 <!-- SCREEN 1: LANDING -->
 <div id="screen-landing" class="screen active">
@@ -1133,6 +1148,19 @@ function setDayNight(mode){
     });
     setTimeout(()=>{fadeEl.style.opacity='0';},400);
   },600);
+}
+
+ 
+ const introVideo = document.getElementById('intro-video');
+
+if(introVideo){
+  introVideo.onended = ()=>{
+    showScreen('screen-landing');
+  };
+}
+
+function skipIntro(){
+  showScreen('screen-landing');
 }
 </script>
 </body>
