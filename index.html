@@ -339,7 +339,50 @@ textarea.form-input{height:65px;resize:none;}
   pointer-events: auto !important;
   z-index: 999 !important;
  }
+#intro-bar{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  padding:16px 20px;
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  background:linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0));
+  z-index:20;
+}
 
+.intro-btn{
+  flex:1;
+  max-width:220px;
+  padding:14px;
+  border:none;
+  border-radius:30px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.25s ease;
+}
+
+.intro-btn.primary{
+  background:linear-gradient(135deg,#f5c542,#c8901a);
+  color:#1a1a1a;
+  box-shadow:0 4px 12px rgba(200,144,26,0.4);
+}
+
+.intro-btn.secondary{
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.3);
+}
+
+.intro-btn:hover{
+  transform:scale(1.05);
+}
+
+.intro-btn:active{
+  transform:scale(0.95);
+}
 
  
 </style>
@@ -372,13 +415,15 @@ textarea.form-input{height:65px;resize:none;}
   </div>
 
   <!-- ปุ่ม -->
-  <div style="
-    position:absolute;bottom:40px;width:100%;
-    display:flex;justify-content:center;gap:10px;
-  ">
-    <button onclick="startIntro()">เริ่มรับชม</button>
-    <button onclick="skipIntro()">ข้าม</button>
-  </div>
+<div id="intro-bar">
+  <button class="intro-btn primary" onclick="startIntro()">
+    ▶ เริ่มรับชม
+  </button>
+
+  <button class="intro-btn secondary" onclick="skipIntro()">
+    ข้าม
+  </button>
+</div>
 
   <!-- เสียง (อยู่ในก้อนเดียวเลย) -->
   <audio id="intro-audio" src="audio/intro.mp3"></audio>
