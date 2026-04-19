@@ -1191,6 +1191,7 @@ const introVideo = document.getElementById('intro-video');
  
  // js intro
 // ===== INTRO ALL-IN-ONE =====
+// ===== INTRO FINAL =====
 const slides = [
   {img:'images/history1.jpg', text:'จากจุดเริ่มต้นของศรัทธา…'},
   {img:'images/history2.jpg', text:'สู่การก่อสร้างศาลเจ้า…'},
@@ -1208,20 +1209,25 @@ function startIntro(){
 
   if(audio){
     audio.currentTime = 0;
-    audio.play().catch(()=>{});
+
+    audio.play().then(()=>{
+      audio.onended = ()=>{
+        stopIntro();
+      };
+    }).catch(()=>{});
   }
 
   interval = setInterval(()=>{
     current++;
 
     if(current >= slides.length){
-      stopIntro();
+      current = slides.length - 1;
       return;
     }
 
     showSlide(current);
 
-  }, 2500);
+  }, 3000);
 }
 
 function skipIntro(){
@@ -1258,6 +1264,7 @@ function showSlide(i){
     slide.style.opacity = 1;
   },300);
 }
+// ===== END INTRO =====
 // ===== END INTRO =====
 
 
