@@ -1238,78 +1238,40 @@ const introVideo = document.getElementById('intro-video');
 // ===== INTRO ALL-IN-ONE =====
 // ===== INTRO FINAL =====
 const slides = [
-  {img:'images/history1.jpg', text:'จากจุดเริ่มต้นของศรัทธา…'},
-  {img:'images/history2.jpg', text:'สู่การก่อสร้างศาลเจ้า…'},
-  {img:'images/history3.jpg', text:'ศูนย์รวมศรัทธาของชุมชน'}
-];
-
-let current = 0;
-let interval = null;
-
 function startIntro(){
   const audio = document.getElementById('intro-audio');
 
   current = 0;
   showSlide(current);
 
+  // เล่นเสียง
   if(audio){
     audio.currentTime = 0;
+    audio.play().catch(()=>{});
 
-    audio.play().then(()=>{
-      audio.onended = ()=>{
-        stopIntro();
-      };
-    }).catch(()=>{});
+    // เสียงจบ → เข้า landing ทันที
+    audio.onended = ()=>{
+      stopIntro();
+    };
   }
 
+  // ล้าง interval เดิม
+  if(interval){
+    clearInterval(interval);
+  }
+
+  // 18 วิ ÷ 3 รูป = 6000 ms ต่อรูป
   interval = setInterval(()=>{
     current++;
 
     if(current >= slides.length){
-      current = slides.length - 1;
-      return;
+      return; // อยู่ภาพสุดท้าย รอเสียงจบ
     }
 
     showSlide(current);
 
-  }, 3000);
+  }, 6000);
 }
-
-function skipIntro(){
-  stopIntro();
-}
-
-function stopIntro(){
-  const audio = document.getElementById('intro-audio');
-
-  if(interval){
-    clearInterval(interval);
-    interval = null;
-  }
-
-  if(audio){
-    audio.pause();
-    audio.currentTime = 0;
-  }
-
-  showScreen('screen-landing');
-}
-
-function showSlide(i){
-  const slide = document.getElementById('intro-slide');
-  const text = document.getElementById('intro-text');
-
-  if(!slide || !text) return;
-
-  slide.style.opacity = 0;
-
-  setTimeout(()=>{
-    slide.style.backgroundImage = `url(${slides[i].img})`;
-    text.innerText = slides[i].text;
-    slide.style.opacity = 1;
-  },300);
-}
-// ===== END INTRO =====
 // ===== END INTRO =====
 
 
