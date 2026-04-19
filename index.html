@@ -352,8 +352,6 @@ textarea.form-input{height:65px;resize:none;}
 
  <!-- SCREEN 0: INTRO -->
 <div id="screen-intro" class="screen active" style="background:#000;">
-<!-- ===== INTRO (ก้อนเดียวจบ) ===== -->
-<div id="screen-intro" class="screen active" style="background:#000;">
 
   <!-- ภาพ -->
   <div id="intro-slide" style="
@@ -390,7 +388,6 @@ textarea.form-input{height:65px;resize:none;}
 
 
 
-</div>
 
 <!-- SCREEN 1: LANDING -->
 <div id="screen-landing" class="screen">
@@ -1190,79 +1187,6 @@ function setDayNight(mode){
  
 const introVideo = document.getElementById('intro-video');
 
-if (introVideo) {
-  introVideo.muted = true;
-
-  setTimeout(() => {
-    introVideo.play().catch(() => {
-      const btn = document.getElementById('start-intro-btn');
-      if (btn) btn.style.display = 'block';
-    });
-  }, 200);
-
-  introVideo.onended = () => {
-    showScreen('screen-landing');
-  };
-}
-
-function skipIntro(){
-  showScreen('screen-landing');
-}
-
-
- 
-const introVideo = document.getElementById('intro-video');
-const introLoading = document.getElementById('intro-loading');
-const startIntroBtn = document.getElementById('start-intro-btn');
-
-if (introVideo) {
-  introVideo.muted = true;
-
-  introVideo.addEventListener('loadeddata', () => {
-    if (introLoading) introLoading.style.display = 'none';
-  });
-
-  introVideo.addEventListener('canplay', () => {
-    if (introLoading) introLoading.style.display = 'none';
-  });
-
-  setTimeout(() => {
-    introVideo.play().then(() => {
-      if (introLoading) introLoading.style.display = 'none';
-    }).catch(() => {
-      if (introLoading) introLoading.style.display = 'none';
-      if (startIntroBtn) startIntroBtn.style.display = 'block';
-    });
-  }, 200);
-
-  introVideo.onended = () => {
-    showScreen('screen-landing');
-  };
-}
-
-const introVideo = document.getElementById('intro-video');
-const introLoading = document.getElementById('intro-loading');
-const startIntroBtn = document.getElementById('start-intro-btn');
-
-function goToLanding(){
-  if (introLoading) introLoading.style.display = 'none';
-  showScreen('screen-landing');
-}
-
-function skipIntro(){
-  goToLanding();
-}
-
-function startIntro(){
-  if (!introVideo) return goToLanding();
-  introVideo.muted = true;
-  introVideo.play().then(() => {
-    if (introLoading) introLoading.style.display = 'none';
-    if (startIntroBtn) startIntroBtn.style.display = 'none';
-  }).catch(() => {
-    goToLanding();
-  });
-}
 
  
  // js intro
