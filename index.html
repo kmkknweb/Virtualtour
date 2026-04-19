@@ -383,7 +383,14 @@ textarea.form-input{height:65px;resize:none;}
 .intro-btn:active{
   transform:scale(0.95);
 }
-
+#intro-text{
+  font-size:28px !important;
+  color:#f5c542 !important;
+  text-shadow:
+    0 0 8px rgba(245,197,66,.7),
+    0 0 16px rgba(245,197,66,.55),
+    0 0 26px rgba(200,144,26,.45);
+}
  
 </style>
 </head>
@@ -1236,6 +1243,7 @@ function setDayNight(mode){
  
  // js intro
 // ===== INTRO ALL-IN-ONE =====
+// ===== INTRO (FINAL + DELAY 5s) =====
 const slides = [
   {img:'images/history1.jpg', text:'จากจุดเริ่มต้นของศรัทธา…'},
   {img:'images/history2.jpg', text:'สู่การก่อสร้างศาลเจ้า…'},
@@ -1245,31 +1253,58 @@ const slides = [
 let current = 0;
 let interval = null;
 let introTimeout = null;
+let introDelayTimeout = null;
 
 function startIntro(){
   const audio = document.getElementById('intro-audio');
+  const text  = document.getElementById('intro-text');
+  const startBtn = document.querySelector('#intro-bar .primary');
+  const skipBtn  = document.querySelector('#intro-bar .secondary');
 
+  // กันกดซ้ำ
+  if(startBtn) startBtn.disabled = true;
+
+  // ล้างตัวจับเวลาเดิม
+  if(interval){ clearInterval(interval); interval = null; }
+  if(introTimeout){ clearTimeout(introTimeout); introTimeout = null; }
+  if(introDelayTimeout){ clearTimeout(introDelayTimeout); introDelayTimeout = null; }
+
+  // รีเซ็ตสถานะ
   current = 0;
-  showSlide(current);
 
-  if(interval) clearInterval(interval);
-  if(introTimeout) clearTimeout(introTimeout);
+  // แสดงข้อความระหว่างรอ
+  if(text){ text.innerText = 'กำลังเตรียมข้อมูล...'; }
 
-  if(audio){
-    audio.pause();
-    audio.currentTime = 0;
-    audio.play().catch(()=>{});
-  }
+  // 🔥 หน่วง 5 วินาที
+  introDelayTimeout = setTimeout(()=>{
 
-  interval = setInterval(()=>{
-    current++;
-    if(current >= slides.length) return;
+    // เริ่มแสดงสไลด์
     showSlide(current);
-  }, 5300);
 
-  introTimeout = setTimeout(()=>{
-    stopIntro();
-  }, 16000);
+    // เริ่มเสียง
+    if(audio){
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play().catch(()=>{});
+    }
+
+    // เปลี่ยนภาพ (18 วิ → ใช้ 16 วิ ตัดท้ายเงียบ → รูปละ ~5.3 วิ)
+    interval = setInterval(()=>{
+      current++;
+      if(current >= slides.length){
+        return; // ค้างภาพสุดท้าย รอจบเวลา
+      }
+      showSlide(current);
+    }, 5300);
+
+    // 🔥 จบที่ 16 วินาที (ไม่รอ silence ท้าย)
+    introTimeout = setTimeout(()=>{
+      stopIntro();
+    }, 16000);
+
+    if(startBtn) startBtn.disabled = false;
+
+  }, 5000);
 }
 
 function skipIntro(){
@@ -1279,8 +1314,9 @@ function skipIntro(){
 function stopIntro(){
   const audio = document.getElementById('intro-audio');
 
-  if(interval) clearInterval(interval);
-  if(introTimeout) clearTimeout(introTimeout);
+  if(interval){ clearInterval(interval); interval = null; }
+  if(introTimeout){ clearTimeout(introTimeout); introTimeout = null; }
+  if(introDelayTimeout){ clearTimeout(introDelayTimeout); introDelayTimeout = null; }
 
   if(audio){
     audio.pause();
@@ -1292,7 +1328,7 @@ function stopIntro(){
 
 function showSlide(i){
   const slide = document.getElementById('intro-slide');
-  const text = document.getElementById('intro-text');
+  const text  = document.getElementById('intro-text');
 
   if(!slide || !text) return;
 
@@ -1300,10 +1336,11 @@ function showSlide(i){
 
   setTimeout(()=>{
     slide.style.backgroundImage = `url(${slides[i].img})`;
-    text.innerText = slides[i].text;
+    text.innerText = slides[i].text; // เปลี่ยนข้อความตามภาพ
     slide.style.opacity = 1;
   }, 300);
 }
+// ===== END INTRO =====
 // ===== END INTRO =====
 
 
