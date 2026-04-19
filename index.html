@@ -404,13 +404,28 @@ textarea.form-input{height:65px;resize:none;}
 <div id="screen-intro" class="screen active" style="background:#000;">
 
   <!-- ภาพ -->
-  <div id="intro-slide" style="
-    position:absolute;inset:0;
-    background-size:contain;
-    background-repeat:no-repeat;
-    background-position:center;
-    transition:opacity 1s;
-  "></div>
+<div id="intro-slide" style="
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+
+  width:68vw;
+  height:56vh;
+  background-image:url('images/hero.jpg');
+  background-size:cover;
+  background-repeat:no-repeat;
+  background-position:center;
+
+  border-radius:22px;
+  overflow:hidden;
+
+  box-shadow:
+    0 0 70px rgba(255,190,80,0.18),
+    0 24px 60px rgba(0,0,0,0.55);
+
+  transition:opacity 1s;
+"></div>
 
   <!-- ข้อความ -->
   <div id="intro-text" style="
