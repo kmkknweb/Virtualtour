@@ -1236,36 +1236,39 @@ const introVideo = document.getElementById('intro-video');
  
  // js intro
 // ===== INTRO ALL-IN-ONE =====
-// ===== INTRO FINAL =====
 function startIntro(){
   const audio = document.getElementById('intro-audio');
 
   current = 0;
   showSlide(current);
 
+  // เล่นเสียง
   if(audio){
     audio.currentTime = 0;
     audio.play().catch(()=>{});
+
+    // เสียงจบ → เข้า landing ทันที
+    audio.onended = ()=>{
+      stopIntro();
+    };
   }
 
+  // ล้าง interval เดิม
   if(interval){
     clearInterval(interval);
   }
 
+  // 18 วิ ÷ 3 รูป = 6000 ms ต่อรูป
   interval = setInterval(()=>{
     current++;
 
     if(current >= slides.length){
-      return;
+      return; // อยู่ภาพสุดท้าย รอเสียงจบ
     }
 
     showSlide(current);
 
-  }, 5300);
-
-  setTimeout(()=>{
-    stopIntro();
-  }, 16000);
+  }, 6000);
 }
 // ===== END INTRO =====
 
