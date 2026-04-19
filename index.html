@@ -1027,7 +1027,7 @@ document.getElementById('btn-worship').addEventListener('click',()=>{
   const pht=document.getElementById('worship-placeholder-text');
   vEl.style.display='none';iEl.style.display='none';ph.style.display='flex';pht.textContent='กำลังโหลด...';
  /* vEl.src=`video/worship_${currentDeity}.mp4`; */
-  vEl.src=`video/worship_pueng}.mp4`; 
+  vEl.src=`video/worship.mp4`; 
   vEl.load();
   vEl.oncanplay=()=>{vEl.style.display='block';ph.style.display='none';};
   vEl.onerror=()=>{
