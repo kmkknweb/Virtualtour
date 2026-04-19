@@ -341,35 +341,29 @@ textarea.form-input{height:65px;resize:none;}
 <div id="stars"></div>
 
 
- 
-<!-- SCREEN 0: INTRO -->
-<div id="screen-intro" class="screen active">
-  <video id="intro-video" autoplay muted playsinline
+ <!-- SCREEN 0: INTRO -->
+<div id="screen-intro" class="screen active" style="background:#000;">
+  <video id="intro-video" muted playsinline preload="auto"
     style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;">
     <source src="video/intro.mp4" type="video/mp4">
   </video>
 
   <div id="intro-loading" style="
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    flex-direction:column;gap:12px;
-    background:rgba(0,0,0,.65);color:#fff;z-index:12;
-    font-size:18px;
-  ">
-    <div style="font-size:28px">⏳</div>
-    <div>กำลังเตรียมข้อมูลการรับชม…</div>
+    flex-direction:column;gap:10px;background:#000;color:#fff;z-index:12;">
+    <div style="font-size:18px;">กำลังเตรียมการรับชม...</div>
   </div>
 
   <button id="start-intro-btn" onclick="startIntro()" style="
     position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
     z-index:13;padding:12px 24px;border:none;border-radius:24px;
-    background:rgba(0,0,0,.65);color:#fff;font-size:16px;display:none;
+    background:rgba(0,0,0,.7);color:#fff;font-size:16px;display:none;
   ">เริ่มรับชม</button>
 
   <button onclick="skipIntro()" style="
-    position:absolute;top:20px;right:20px;
-    z-index:13;padding:8px 16px;
-    background:rgba(0,0,0,0.5);
-    color:#fff;border:none;border-radius:20px;
+    position:absolute;top:20px;right:20px;z-index:13;
+    padding:8px 16px;background:rgba(0,0,0,.5);color:#fff;
+    border:none;border-radius:20px;
   ">ข้าม</button>
 </div>
 
@@ -1225,20 +1219,63 @@ if (introVideo) {
   };
 }
 
-function skipIntro(){
+const introVideo = document.getElementById('intro-video');
+const introLoading = document.getElementById('intro-loading');
+const startIntroBtn = document.getElementById('start-intro-btn');
+
+function goToLanding(){
+  if (introLoading) introLoading.style.display = 'none';
   showScreen('screen-landing');
 }
 
-function startIntro(){
-  const v = document.getElementById('intro-video');
-  if (!v) return;
-  v.muted = true;
-  v.play().then(() => {
-    if (introLoading) introLoading.style.display = 'none';
-    if (startIntroBtn) startIntroBtn.style.display = 'none';
-  }).catch(() => {});
+function skipIntro(){
+  goToLanding();
 }
 
+function startIntro(){
+  if (!introVideo) return goToLanding();
+  introVideo.muted = true;
+  introVideo.play().then(() => {
+    if (introLoading) introLoading.style.display = 'none';
+    if (startIntroBtn) startIntroBtn.style.display = 'none';
+  }).catch(() => {
+    goToLanding();
+  });
+}
+
+ 
+ // js intro
+if (introVideo) {
+  introVideo.muted = true;
+
+  // ถ้าวิดีโอพร้อมเล่น
+  introVideo.addEventListener('canplay', () => {
+    if (introLoading) introLoading.style.display = 'none';
+    introVideo.play().catch(() => {
+      if (startIntroBtn) startIntroBtn.style.display = 'block';
+    });
+  });
+
+  // ถ้าเล่นจบ
+  introVideo.addEventListener('ended', () => {
+    goToLanding();
+  });
+
+  // ถ้าไฟล์หาย / โหลดไม่ได้
+  introVideo.addEventListener('error', () => {
+    goToLanding();
+  });
+
+  // ถ้ารอเกิน 4 วินาที ยังไม่มา ให้ข้ามเลย
+  setTimeout(() => {
+    const notStarted = introVideo.paused && introVideo.readyState < 3;
+    if (notStarted) {
+      goToLanding();
+    }
+  }, 4000);
+} else {
+  goToLanding();
+ }
 
  
 </script>
