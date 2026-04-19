@@ -1123,7 +1123,7 @@ function setDayNight(mode){
       type:'equirectangular',panorama:panoSrc,
       autoLoad:true,autoRotate:-1.5,autoRotateInactivityDelay:4000,
       showZoomCtrl:false,showFullscreenCtrl:false,mouseZoom:true,
-      hfov:curHfov,pitch:curPitch,yaw:curYaw,
+      hfov:curHfov,vaov:60,vOffset:0,pitch:curPitch,yaw:curYaw,
       hotSpots:sc.hotspots.map(h=>({
         pitch:h.pitch,yaw:h.yaw,
         cssClass:h.nav?'custom-hotspot':'custom-hotspot hotspot-deity',
