@@ -1167,18 +1167,26 @@ textarea.form-input{height:65px;resize:none;}
   touch-action:manipulation;
 }
 
- /* การจัดการแสดงผลของมาสคอต (โคมจิ๋ว) */
+/* การจัดการแสดงผลของมาสคอต (โคมจิ๋ว) */
 .khomjiw-container {
   position: fixed;
   top: 20px; /* อยู่ด้านบน */
   left: 20px; /* อยู่ด้านซ้าย */
   z-index: 10; /* ให้อยู่เหนือเนื้อหาบนหน้า */
+  animation: floatUpDown 3s ease-in-out infinite; /* ทำให้ลอยขึ้นลง */
 }
 
 .khomjiw {
   width: 120px;
   cursor: pointer;
 }
+
+/* อนิเมชั่นลอยขึ้น-ลง */
+@keyframes floatUpDown {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); } /* ลอยขึ้น */
+  100% { transform: translateY(0); } /* กลับลงที่เดิม */
+                 }
 </style>
 
 <script>
