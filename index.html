@@ -1166,6 +1166,59 @@ textarea.form-input{height:65px;resize:none;}
   color:var(--white-faint);font-size:13px;cursor:pointer;
   touch-action:manipulation;
 }
+
+
+/* การจัดการแสดงผลของมาสคอต (โคมจิ๋ว) */
+.khomjiw-container {
+  position: fixed;
+  top: 20px; /* อยู่ด้านบน */
+  left: 20px; /* อยู่ด้านซ้าย */
+  z-index: 10; /* ให้อยู่เหนือเนื้อหาบนหน้า */
+  animation: floatUpDown 3s ease-in-out infinite; /* ทำให้ลอยขึ้นลง */
+}
+
+.khomjiw {
+  width: 120px;
+  cursor: pointer; /* สามารถคลิกได้ */
+}
+
+/* อนิเมชั่นลอยขึ้น-ลง */
+@keyframes floatUpDown {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); } /* ลอยขึ้น */
+  100% { transform: translateY(0); } /* กลับลงที่เดิม */
+}
+
+/* กล่องคำถาม */
+#question-box {
+  position: fixed;
+  top: 10%; /* ปรับตำแหน่งให้ไปอยู่ด้านบน */
+  left: 10%;
+  width: 300px;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  display: none; /* ซ่อนกล่องคำถามเริ่มต้น */
+}
+
+/* กล่องคำตอบ */
+#answer-box {
+  position: fixed;
+  top: 15%; /* อยู่ใกล้กล่องคำถาม */
+  left: 10%;
+  width: 300px;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  display: none; /* ซ่อนกล่องคำตอบ */
+}
+ 
+/* ปิดการจัดการแสดงผลของมาสคอต (โคมจิ๋ว) */
+ 
 </style>
 
 <script>
@@ -1269,6 +1322,27 @@ box-shadow:
   </div>
 </div>
 
+
+ 
+<!-- โคมจิ๋ว (มาสคอต) -->
+<div class="khomjiw-container">
+  <img src="khomjiw-open-eye.png" class="khomjiw" alt="โคมจิ๋ว" onclick="showQuestionBox()">
+</div>
+
+<!-- กล่องคำถาม -->
+<div id="question-box">
+  <input type="text" id="question" class="input-field" placeholder="พิมพ์คำถาม เช่น เปิดปิดกี่โมง?" oninput="checkQuestion()">
+</div>
+
+<!-- กล่องคำตอบ -->
+<div id="answer-box">
+  <p id="answer"></p>
+</div>
+
+
+
+
+ 
 <!-- SCREEN 2: TOUR -->
 <div id="screen-tour" class="screen">
   <div id="pannellum-container"></div>
@@ -2482,6 +2556,45 @@ document.getElementById('btn-fortune-share').addEventListener('click', async () 
 });
 
 
+
+/* Khomy */
+// คำตอบที่ตั้งไว้
+const answers = {
+  "ศาลเจ้าชื่ออะไร": "ศาลเจ้าปึงเถ่ากงม่าขอนแก่น",
+  "เวลาเปิด": "ศาลเจ้ามีเวลาเปิดตั้งแต่ 08:00 ถึง 17:00 น.",
+  "เวลาเปิดปิด": "ศาลเจ้ามีเวลาเปิดตั้งแต่ 08:00 ถึง 17:00 น.",
+  "ศาลเจ้าอยู่จังหวัดอะไร": "ศาลเจ้าอยู่ที่จังหวัดขอนแก่น",
+};
+
+// ฟังก์ชันแสดงกล่องคำถามเมื่อคลิกที่มาสคอต
+function showQuestionBox() {
+  document.getElementById("question-box").style.display = "block";
+  document.getElementById("answer-box").style.display = "none";
+}
+
+// ฟังก์ชันตรวจสอบคำถาม
+function checkQuestion() {
+  const question = document.getElementById("question").value.toLowerCase();
+  const answerBox = document.getElementById("answer-box");
+  const answer = answers[question];
+
+  if (answer) {
+    document.getElementById("answer").innerHTML = answer;
+    answerBox.style.display = "block";
+  } else {
+    answerBox.style.display = "none";
+  }
+}
+
+// ทำให้โคมจิ๋วกระพริบตาทุก 5 วินาที
+setInterval(function() {
+  const khomjiw = document.querySelector('.khomjiw');
+  khomjiw.src = khomjiw.src.includes('open-eye.png') ? 'khomjiw-closed-eye.png' : 'khomjiw-open-eye.png';
+}, 5000);
+
+
+
+ 
 /* LINE REWARD */
 const LINE_ID = '@PuengShrine'; // TODO: เปลี่ยนเป็น LINE ID จริง
 
