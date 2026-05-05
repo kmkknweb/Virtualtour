@@ -2819,12 +2819,12 @@ function addUserMessage(text){
 
 async function askAI(question) {
   const res = await fetch("https://script.google.com/macros/s/AKfycbzSzn9l4d1ghgKnS2Ty2hkH7XaACOODrbG1MOFn7NdjEEXlCYY86KahGxvhLydTRVqG/exec", {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    body: JSON.stringify({ question: question })
-  });
+  method: "POST",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify({ question })
+})
 
   const text = await res.text();
   try {
