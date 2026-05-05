@@ -2870,7 +2870,7 @@ async function sendChat(){
   if(img && typeof KJ !== 'undefined') img.src = KJ.QUESTION;
 
   try {
-    const ans = /*await askAI(q);*/
+    const ans = await askAI(q);
     addBotMessage(ans || "ขออภัยค่ะ โคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
     addBotMessage("เชื่อมต่อ AI ไม่สำเร็จค่ะ 🙏");
