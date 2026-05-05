@@ -2906,13 +2906,23 @@ function addUserMessage(text){
 
 function askQuestion(key){
   addUserMessage(key);
-  setTimeout(()=>{
-    const ans = ANSWERS[key];
-    if(ans) addBotMessage(ans);
-    else addBotMessage('ขออภัยค่ะ น้องโคมจิ๋วยังไม่มีข้อมูลเรื่องนี้ กรุณาติดต่อศาลเจ้าโดยตรงนะคะ 🙏');
-  }, 400);
-}
+addBotMessage("โคมจิ๋วกำลังคิด...");
 
+  const aiAnswer = await askAI(key);
+
+  addBotMessage(aiAnswer || "ขออภัยค่ะ โคมจิ๋วยังตอบไม่ได้ 🙏");
+}
+ speak(aiAnswer);
+/* AI ตอบคำถาม */
+ async function askAI(question) {
+  const res = await fetch("https://script.google.com/macros/s/AKfycbzSzn9l4d1ghgKnS2Ty2hkH7XaACOODrbG1MOFn7NdjEEXlCYY86KahGxvhLydTRVqG/exec", {
+    method: "POST",
+    body: JSON.stringify({ question })
+  });
+
+  const data = await res.json();
+  return data.answer;
+ }
 function sendChat(){
   const input = document.getElementById('chat-input');
   const q = input.value.trim();
@@ -3141,6 +3151,8 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 // also try immediately in case DOM already ready
 if(document.readyState !== 'loading') updateStampUI();
+
+
 </script>
 
 
