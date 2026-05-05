@@ -2844,11 +2844,11 @@ async function askQuestion(key){
   if(img && typeof KJ !== 'undefined') img.src = KJ.QUESTION;
 
   try {
-    const ans = "ai work" /*await askAI(key);
+    const ans = await askAI(key);
     addBotMessage(ans || "ขออภัยค่ะ โคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
     addBotMessage("เชื่อมต่อ AI ไม่สำเร็จค่ะ 🙏");
-  }*/
+  }
 
   if(img && typeof KJ !== 'undefined'){
     img.src = KJ.OK;
