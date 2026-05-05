@@ -48,7 +48,7 @@
    pano_guanyin_plaza.jpg- panorama ลานเจ้าแม่กวนอิม
 =================================================================
 */
- /* ถ้าถ่ายภาพใหม่แล้วภาพกลางวันกลางคืนไม่ตรงกันให้ไปแก้ที่บรรทัด 2406*/
+
 :root{
   --navy:#0d0b10;--navy-2:#1a1020;--navy-3:#2a1a2e;
   --blue:#3a1f4a;--blue-mid:#44101f;
@@ -2404,7 +2404,7 @@ function setDayNight(mode){
       showZoomCtrl:false,showFullscreenCtrl:false,mouseZoom:true,
       hfov:curHfov,vaov:60,vOffset:0,pitch:curPitch,yaw:curYaw,
       hotSpots:sc.hotspots.map(h=>({
-        pitch:h.pitch,yaw:h.yaw + (isNight ? -50 : 0),
+        pitch:h.pitch,yaw:h.yaw,
         cssClass:h.nav?'custom-hotspot':'custom-hotspot hotspot-deity',
         tooltip:h.tip,clickHandlerFunc:h.action
       })),
