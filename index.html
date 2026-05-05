@@ -2403,7 +2403,7 @@ function setDayNight(mode){
       showZoomCtrl:false,showFullscreenCtrl:false,mouseZoom:true,
       hfov:curHfov,vaov:60,vOffset:0,pitch:curPitch,yaw:curYaw,
       hotSpots:sc.hotspots.map(h=>({
-        pitch:h.pitch,yaw:h.yaw + (isNight ? -30 : 0),
+        pitch:h.pitch,yaw:h.yaw + (isNight ? -50 : 0),
         cssClass:h.nav?'custom-hotspot':'custom-hotspot hotspot-deity',
         tooltip:h.tip,clickHandlerFunc:h.action
       })),
