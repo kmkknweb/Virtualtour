@@ -2847,12 +2847,30 @@ async function askQuestion(key){
  async function askAI(question) {
   const res = await fetch("https://script.google.com/macros/s/AKfycbzSzn9l4d1ghgKnS2Ty2hkH7XaACOODrbG1MOFn7NdjEEXlCYY86KahGxvhLydTRVqG/exec", {
     method: "POST",
-    body: JSON.stringify({ question })
-  });
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question })
+    });
 
-  const data = await res.json();
-  return data.answer;
+    const text = await res.text();
+
+    // 👇 โชว์ผลตรงหน้าเลย ไม่ต้อง console
+    addBotMessage("DEBUG: " + text);
+
+    const data = JSON.parse(text);
+    return data.answer;
+
+  } catch (err) {
+    addBotMessage("ERROR: " + err.message);
+    return "⚠️ ระบบมีปัญหา";
+  }
  }
+
+
+
+
+   
 async function sendChat(){
   const input = document.getElementById('chat-input');
   const q = input.value.trim();
