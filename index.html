@@ -2873,7 +2873,8 @@ async function sendChat(){
     const ans = await askAI(q);
     addBotMessage(ans || "ขออภัยค่ะ โคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
-    addBotMessage("เชื่อมต่อ AI ไม่สำเร็จค่ะ 🙏");
+    addBotMessage("ERROR: " + e.message);
+  
   }
 
   if(img && typeof KJ !== 'undefined'){
