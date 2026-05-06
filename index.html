@@ -2845,14 +2845,14 @@ async function askAI(question) {
 
 async function askQuestion(key){
   addUserMessage(key);
-  addBotMessage("AI MODE ✅ โคมจิ๋วกำลังหาคำตอบ...");
+  addBotMessage("น้องโคมจิ๋วกำลังหาคำตอบ...");
 
   const img = (typeof kjImg === 'function') ? kjImg() : null;
   if(img && typeof KJ !== 'undefined') img.src = KJ.QUESTION;
 
   try {
     const ans = await askAI(key);
-    addBotMessage(ans || "ขออภัยครับ โคมจิ๋วยังตอบไม่ได้ 🙏");
+    addBotMessage(ans || "ขออภัยครับ น้องโคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
     addBotMessage("ERROR: " + e.message);
   }
@@ -2871,14 +2871,14 @@ async function sendChat(){
   addUserMessage(q);
   input.value = '';
 
-  addBotMessage("AI MODE ✅ โคมจิ๋วกำลังหาคำตอบ...");
+  addBotMessage("น้องโคมจิ๋วกำลังหาคำตอบ...");
 
   const img = (typeof kjImg === 'function') ? kjImg() : null;
   if(img && typeof KJ !== 'undefined') img.src = KJ.QUESTION;
 
   try {
     const ans = await askAI(q);
-    addBotMessage(ans || "ขออภัยครับ โคมจิ๋วยังตอบไม่ได้ 🙏");
+    addBotMessage(ans || "ขออภัยครับ น้องโคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
     addBotMessage("ERROR: " + e.message);
   
