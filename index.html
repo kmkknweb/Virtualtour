@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ศาลเจ้าปึงเถ่ากงม่าขอนแก่น · Intro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Kanit:wght@300;400;500;600;700&family=Noto+Serif+Thai:wght@400;600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --intro-duration:45s;--navy:#0d0b10;--navy-2:#1a1020;--maroon:#44101f;--gold:#f2c46b;--gold-light:#ffe5b1;--white:#fff6eb;--white-dim:#d7c8bc;--white-faint:#9a8a7a;--red:#c91f3d;}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Noto Sans Thai','Kanit',sans-serif;}
+    body{background:radial-gradient(circle at 50% 0%, rgba(201,31,61,.25) 0%, transparent 42%),radial-gradient(circle at 50% 100%, rgba(242,196,107,.12) 0%, transparent 44%),linear-gradient(180deg,#44101f 0%,#1a1020 38%,#0d0b10 100%);color:var(--white);}
+    #intro-screen{position:fixed;inset:0;overflow:hidden;opacity:1;transition:opacity .8s ease;}
+    #intro-screen.fade-out{opacity:0;}
+    .bg-glow{position:absolute;inset:-20%;background:radial-gradient(circle at 50% 18%, rgba(242,196,107,.15), transparent 28%),radial-gradient(circle at 25% 70%, rgba(201,31,61,.12), transparent 30%),radial-gradient(circle at 78% 76%, rgba(242,196,107,.08), transparent 30%);filter:blur(8px);z-index:0;animation:bgPulse 8s ease-in-out infinite;}
+    @keyframes bgPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.04);opacity:1}}
+    #particles{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
+    .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:radial-gradient(circle,#fff3bf 0%,#f2c46b 45%,transparent 70%);opacity:0;animation:floatUp var(--dur,8s) ease-in-out infinite var(--delay,0s);}
+    @keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}18%{opacity:.85}80%{opacity:.45}100%{opacity:0;transform:translateY(-110vh) scale(1.45)}}
+    .intro-header{position:absolute;top:26px;left:18px;right:18px;z-index:5;text-align:center;pointer-events:none;}
+    .intro-pre{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:rgba(242,196,107,.72);margin-bottom:7px;}
+    .intro-title{font-family:'Noto Serif Thai',serif;font-size:clamp(19px,5vw,28px);font-weight:700;line-height:1.45;text-shadow:0 0 30px rgba(242,196,107,.45),0 2px 8px rgba(0,0,0,.7);}
+    .intro-sub{margin-top:5px;font-size:12px;color:var(--white-faint);letter-spacing:.4px;}
+    .stage{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;padding:108px 20px 118px;}
+    .timeline-wrap{position:relative;width:min(440px,100%);height:100%;max-height:620px;}
+    .timeline-line{position:absolute;left:50%;top:18px;bottom:18px;width:2px;transform:translateX(-50%);background:linear-gradient(to bottom,transparent,rgba(242,196,107,.22),rgba(242,196,107,.42),rgba(242,196,107,.22),transparent);box-shadow:0 0 16px rgba(242,196,107,.12);border-radius:2px;}
+    .light-runner{position:absolute;left:50%;top:18px;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,#fff8d7 0%,#ffe08a 32%,#f2c46b 58%,transparent 72%);box-shadow:0 0 18px rgba(242,196,107,.95),0 0 46px rgba(242,196,107,.55);animation:runnerMove var(--intro-duration) linear forwards;z-index:4;animation-play-state:paused;}
+    .light-trail{position:absolute;left:50%;top:18px;width:4px;height:0;transform:translateX(-50%);border-radius:4px;background:linear-gradient(to bottom,rgba(255,229,177,.95),rgba(242,196,107,.55),transparent);box-shadow:0 0 16px rgba(242,196,107,.45);animation:trailGrow var(--intro-duration) linear forwards;z-index:3;animation-play-state:paused;}
+    .playing-anim .light-runner,.playing-anim .light-trail{animation-play-state:running;}
+    @keyframes runnerMove{from{top:18px}to{top:calc(100% - 18px)}}
+    @keyframes trailGrow{from{height:0}to{height:calc(100% - 36px)}}
+    .history-card{position:absolute;width:calc(50% - 18px);min-height:176px;opacity:0;transform:translateY(22px) scale(.96);transition:opacity .8s ease, transform .8s ease, filter .8s ease;filter:blur(3px);z-index:5;}
+    .history-card.show{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
+    .history-card.hide{opacity:.22;transform:translateY(-10px) scale(.96);filter:blur(1px);}
+    .history-card.left{right:calc(50% + 18px);text-align:right;}
+    .history-card.right{left:calc(50% + 18px);text-align:left;}
+    #card1{top:5%;}#card2{top:36%;}#card3{top:67%;}
+    .dot{position:absolute;top:20px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#fff8d7,#f2c46b 55%,#a06010 100%);box-shadow:0 0 14px rgba(242,196,107,.9),0 0 34px rgba(242,196,107,.35);}
+    .history-card.left .dot{right:-26px;}.history-card.right .dot{left:-26px;}
+    .photo{position:relative;width:100%;aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.05);border:1px solid rgba(242,196,107,.35);box-shadow:0 16px 40px rgba(0,0,0,.35),0 0 24px rgba(242,196,107,.09);}
+    .photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.48));pointer-events:none;}
+    .photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04);transition:transform 5s ease;}
+    .history-card.show .photo img{transform:scale(1.14);}
+    .year{margin-top:8px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold-light);text-shadow:0 0 14px rgba(242,196,107,.4);}
+    .caption{margin-top:3px;font-family:'Noto Serif Thai',serif;font-size:13px;line-height:1.45;color:var(--white);}
+    .controls{position:absolute;left:16px;right:16px;bottom:22px;z-index:20;display:flex;flex-direction:column;gap:10px;align-items:center;}
+    .progress{width:min(380px,100%);height:4px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.12);border:1px solid rgba(242,196,107,.15);}
+    .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#a06010,#f2c46b,#ffe5b1);box-shadow:0 0 12px rgba(242,196,107,.7);}
+    .progress-fill.playing{animation:progressFill var(--intro-duration) linear forwards;}@keyframes progressFill{from{width:0%}to{width:100%}}
+    .button-row{display:flex;gap:10px;justify-content:center;align-items:center;width:100%;flex-wrap:wrap;}
+    .btn{appearance:none;border:none;cursor:pointer;touch-action:manipulation;font-family:'Noto Serif Thai','Noto Sans Thai',sans-serif;border-radius:999px;min-height:46px;padding:12px 22px;font-size:14px;font-weight:700;transition:transform .18s ease, filter .18s ease, background .18s ease;}
+    .btn:active{transform:scale(.96);}#btn-start,#btn-start-card{color:#1a0e00;background:linear-gradient(135deg,#c8901a,#f2c46b,#ffe5b1);box-shadow:0 8px 28px rgba(242,196,107,.35),0 0 0 1px rgba(255,229,177,.35) inset;min-width:178px;}
+    #btn-skip{color:rgba(255,229,177,.92);background:rgba(10,6,16,.62);border:1px solid rgba(242,196,107,.38);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);min-width:126px;}
+    .hint{font-size:11px;color:rgba(255,246,235,.62);text-align:center;line-height:1.5;}
+    .tap-layer{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);transition:opacity .35s ease, visibility .35s ease;}
+    .tap-layer.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+    .start-card{width:min(360px,88vw);text-align:center;padding:26px 22px;border-radius:22px;background:linear-gradient(170deg,rgba(26,16,32,.88),rgba(13,11,16,.92));border:1px solid rgba(242,196,107,.35);box-shadow:0 22px 70px rgba(0,0,0,.6),0 0 40px rgba(242,196,107,.12);}
+    .start-icon{font-size:42px;margin-bottom:10px;filter:drop-shadow(0 0 18px rgba(242,196,107,.55));}.start-title{font-family:'Noto Serif Thai',serif;font-size:20px;font-weight:700;margin-bottom:6px;}.start-desc{font-size:13px;color:var(--white-dim);line-height:1.8;margin-bottom:18px;}
+    .audio-fallback{display:none;margin-top:7px;font-size:11px;color:rgba(255,229,177,.75);}.audio-fallback.show{display:block;}
+
+    /* KHOMJIW NARRATOR */
+    #khomjiw-guide{
+      position:absolute;
+      width:112px;
+      z-index:18;
+      left:0;
+      top:0;
+      opacity:0;
+      --kx:50vw;
+      --ky:50vh;
+      transform:translate3d(var(--kx),var(--ky),0) translate(-50%,-50%) scale(.88);
+      transition:opacity .55s ease, transform 2.15s cubic-bezier(.22,.95,.24,1.05);
+      pointer-events:none;
+      filter:drop-shadow(0 0 20px rgba(242,196,107,.55));
+      will-change:transform,opacity;
+    }
+    #khomjiw-guide.show{
+      opacity:1;
+      transform:translate3d(var(--kx),var(--ky),0) translate(-50%,-50%) scale(1);
+    }
+    #khomjiw-guide.pos1{--kx:74vw;--ky:31vh;}
+    #khomjiw-guide.pos2{--kx:25vw;--ky:52vh;}
+    #khomjiw-guide.pos3{--kx:74vw;--ky:73vh;}
+    #khomjiw-guide.flying img,
+    #khomjiw-guide.flying .khomjiw-fallback{
+      animation:khomyFly 2.15s ease-in-out, khomyBob 2.2s ease-in-out infinite 2.15s;
+    }
+    #khomjiw-guide img{
+      width:100%;
+      display:block;
+      animation:khomyBob 2.2s ease-in-out infinite;
+    }
+    .khomjiw-fallback{
+      width:96px;
+      height:96px;
+      border-radius:50%;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      font-size:48px;
+      background:radial-gradient(circle at 35% 25%,#fff8d7,#f2c46b 38%,#c8901a 72%,rgba(120,50,10,.85));
+      border:1px solid rgba(255,229,177,.65);
+      box-shadow:0 0 24px rgba(242,196,107,.48);
+      animation:khomyBob 2.2s ease-in-out infinite;
+    }
+    #khomjiw-guide.no-img img{display:none;}
+    #khomjiw-guide.no-img .khomjiw-fallback{display:flex;}
+    @keyframes khomyBob{
+      0%,100%{transform:translateY(0) rotate(-1deg);}
+      50%{transform:translateY(-9px) rotate(1.5deg);}
+    }
+    @keyframes khomyFly{
+      0%{transform:translateY(0) rotate(-4deg) scale(.96);}
+      28%{transform:translateY(-24px) rotate(6deg) scale(1.04);}
+      58%{transform:translateY(14px) rotate(-5deg) scale(1.02);}
+      100%{transform:translateY(0) rotate(0deg) scale(1);}
+    }
+    .khomjiw-bubble{
+      position:absolute;
+      right:72%;
+      bottom:82%;
+      width:190px;
+      max-width:52vw;
+      padding:10px 12px;
+      border-radius:16px 16px 4px 16px;
+      background:rgba(20,8,28,.92);
+      border:1px solid rgba(242,196,107,.48);
+      color:var(--white);
+      font-size:12px;
+      line-height:1.7;
+      box-shadow:0 12px 34px rgba(0,0,0,.38),0 0 20px rgba(242,196,107,.12);
+      opacity:0;
+      transform:translateY(8px) scale(.92);
+      transform-origin:bottom right;
+      transition:opacity .35s ease, transform .35s ease;
+    }
+    #khomjiw-guide.talking .khomjiw-bubble{
+      opacity:1;
+      transform:translateY(0) scale(1);
+    }
+    .voice-note{
+      display:none;
+      margin-top:7px;
+      font-size:11px;
+      color:rgba(255,229,177,.75);
+      text-align:center;
+    }
+    .voice-note.show{display:block;}
+
+    @media (max-width:520px){.stage{padding:108px 16px 118px;}.timeline-wrap{max-height:610px;}.history-card{width:calc(50% - 14px);}.history-card.left{right:calc(50% + 14px);}.history-card.right{left:calc(50% + 14px);}.history-card.left .dot{right:-22px;}.history-card.right .dot{left:-22px;}.caption{font-size:12px;}.year{font-size:11px;}.photo{border-radius:13px;}}
+    @media (max-height:680px){.intro-header{top:18px;}.intro-title{font-size:18px;}.intro-sub{display:none;}.stage{padding-top:86px;padding-bottom:104px;}.timeline-wrap{max-height:500px;}.history-card{min-height:105px;}.caption{font-size:11px;}.year{font-size:10px;margin-top:5px;}.controls{bottom:14px;}}
+  </style>
+</head>
+<body>
+  <main id="intro-screen">
+    <div class="bg-glow"></div><div id="particles"></div>
+    <header class="intro-header"><div class="intro-pre">VIRTUAL TOUR INTRO</div><h1 class="intro-title">ศาลเจ้าปึงเถ่ากงม่าขอนแก่น</h1><div class="intro-sub">การเดินทางของแสงศรัทธา</div></header>
+    <section class="stage" aria-label="เส้นเวลาอินโทร"><div class="timeline-wrap" id="timelineWrap"><div class="timeline-line"></div><div class="light-trail"></div><div class="light-runner"></div>
+      <article class="history-card left" id="card1"><span class="dot"></span><div class="photo"><img src="images/history1.jpg" alt="ภาพประวัติช่วงที่ 1"></div><div class="year">BEGINNING</div><div class="caption">จุดเริ่มต้นแห่งแรงศรัทธา</div></article>
+      <article class="history-card right" id="card2"><span class="dot"></span><div class="photo"><img src="images/history2.jpg" alt="ภาพประวัติช่วงที่ 2"></div><div class="year">COMMUNITY</div><div class="caption">รวมใจชุมชน สืบสานวัฒนธรรม</div></article>
+      <article class="history-card left" id="card3"><span class="dot"></span><div class="photo"><img src="images/history3.jpg" alt="ภาพประวัติช่วงที่ 3"></div><div class="year">TODAY</div><div class="caption">เปิดประสบการณ์ Virtual Tour</div></article>
+    </div></section>
+
+    <div id="khomjiw-guide" aria-hidden="true">
+      <div class="khomjiw-bubble" id="khomjiwBubble">สวัสดีครับ ผมโคมจิ๋ว จะพาทุกท่านย้อนชมเรื่องราวของศาลเจ้า</div>
+      <img id="khomjiwImg"
+           src="images/khomjiw-beside.png"
+           data-srcs="images/khomjiw-beside.png,images/khomjiw-hello.png,images/khomjiw-open-eye.png,images/khomjiw-ok.png,images/khomjiw-ask.png"
+           alt="">
+      <div class="khomjiw-fallback">🏮</div>
+    </div>
+    <div class="controls"><div class="progress"><div class="progress-fill" id="progressFill"></div></div><div class="button-row"><button class="btn" id="btn-start" type="button">เริ่มรับชม</button><button class="btn" id="btn-skip" type="button">ข้ามเข้าสู่ทัวร์</button></div><div class="hint">โคมจิ๋วจะบรรยายตามภาพ แล้วพาเข้าสู่ Virtual Tour อัตโนมัติ</div><div class="voice-note" id="voiceNote">หากบางเครื่องไม่มีเสียงพูด ระบบยังเล่นภาพต่อได้ตามปกติ</div></div>
+    <div class="tap-layer" id="tapLayer"><div class="start-card"><div class="start-icon">🏮</div><div class="start-title">เริ่มการเดินทาง</div><div class="start-desc">รับชมอินโทรเส้นเวลา พร้อมเสียงโคมจิ๋วประมาณ 45 วินาที</div><button class="btn" id="btn-start-card" type="button">เริ่มรับชม</button></div></div>
+  </main>
+  <script>
+    const INTRO_DURATION = 45000;
+    const TOUR_URL = "tour.html";
+
+    const cards = [
+      {
+        el: document.getElementById("card1"),
+        show: 900,
+        hide: 15000,
+        pos: "pos1",
+        pose: "images/khomjiw-hello.png",
+        speech: "สวัสดีครับ ผมโคมจิ๋ว จะพาทุกท่านย้อนชมเรื่องราวของศาลเจ้าปึงเถ่ากงม่าขอนแก่น จากจุดเริ่มต้นแห่งแรงศรัทธา และความร่วมใจของผู้คนในชุมชน",
+        bubble: "จุดเริ่มต้นแห่งแรงศรัทธา"
+      },
+      {
+        el: document.getElementById("card2"),
+        show: 15000,
+        hide: 30500,
+        pos: "pos2",
+        pose: "images/khomjiw-beside.png",
+        speech: "ตลอดระยะเวลาที่ผ่านมา ศาลเจ้าแห่งนี้เป็นศูนย์รวมจิตใจของชาวไทยเชื้อสายจีนและชุมชนเมืองขอนแก่น สืบสานประเพณี ความกตัญญู และวัฒนธรรมอันดีงาม",
+        bubble: "รวมใจชุมชน สืบสานวัฒนธรรม"
+      },
+      {
+        el: document.getElementById("card3"),
+        show: 30500,
+        hide: 44500,
+        pos: "pos3",
+        pose: "images/khomjiw-ok.png",
+        speech: "วันนี้ เราขอเชิญทุกท่านเข้าสู่ประสบการณ์ Virtual Tour เพื่อชมบรรยากาศ เรียนรู้เรื่องราว และสัมผัสแสงศรัทธาของศาลเจ้าได้จากทุกที่",
+        bubble: "เปิดประสบการณ์ Virtual Tour"
+      }
+    ];
+
+    const startBtn = document.getElementById("btn-start");
+    const startCardBtn = document.getElementById("btn-start-card");
+    const skipBtn = document.getElementById("btn-skip");
+    const tapLayer = document.getElementById("tapLayer");
+    const progressFill = document.getElementById("progressFill");
+    const screen = document.getElementById("intro-screen");
+    const voiceNote = document.getElementById("voiceNote");
+    const timelineWrap = document.getElementById("timelineWrap");
+    const khomjiw = document.getElementById("khomjiw-guide");
+    const khomjiwBubble = document.getElementById("khomjiwBubble");
+
+    const khomjiwImg = document.getElementById("khomjiwImg");
+
+    function setupKhomjiwImageFallback(){
+      if(!khomjiwImg) return;
+      const sources = (khomjiwImg.dataset.srcs || khomjiwImg.src).split(",").map(s => s.trim()).filter(Boolean);
+      let i = 0;
+
+      khomjiwImg.onerror = () => {
+        i++;
+        if(i < sources.length){
+          khomjiwImg.src = sources[i];
+        }else{
+          khomjiw.classList.add("no-img");
+        }
+      };
+
+      khomjiwImg.onload = () => {
+        khomjiw.classList.remove("no-img");
+      };
+
+      khomjiwImg.src = sources[0];
+    }
+
+
+    let timers = [];
+    let started = false;
+    let thaiVoice = null;
+
+    function makeParticles(){
+      const wrap = document.getElementById("particles");
+      for(let i=0;i<44;i++){
+        const p = document.createElement("span");
+        p.className = "particle";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.top = (65 + Math.random() * 40) + "%";
+        p.style.setProperty("--dur", (6 + Math.random() * 6).toFixed(1) + "s");
+        p.style.setProperty("--delay", (Math.random() * 6).toFixed(1) + "s");
+        wrap.appendChild(p);
+      }
+    }
+
+    function loadThaiVoice(){
+      if(!("speechSynthesis" in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      thaiVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("th")) || voices[0] || null;
+      return thaiVoice;
+    }
+
+    if("speechSynthesis" in window){
+      window.speechSynthesis.onvoiceschanged = loadThaiVoice;
+      loadThaiVoice();
+    }
+
+    function speakKhomjiw(text){
+      if(!("speechSynthesis" in window)){
+        voiceNote.classList.add("show");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "th-TH";
+      u.rate = 0.94;
+      u.pitch = 1.12;
+      u.volume = 1;
+
+      const voice = loadThaiVoice();
+      if(voice) u.voice = voice;
+
+      u.onstart = () => khomjiw.classList.add("talking");
+      u.onend = () => khomjiw.classList.remove("talking");
+      u.onerror = () => {
+        khomjiw.classList.remove("talking");
+        voiceNote.classList.add("show");
+      };
+
+      window.speechSynthesis.speak(u);
+    }
+
+    function clearTimers(){
+      timers.forEach(t => clearTimeout(t));
+      timers = [];
+    }
+
+    function resetCards(){
+      cards.forEach(item => item.el.classList.remove("show","hide"));
+      khomjiw.classList.remove("talking","show","pos1","pos2","pos3","flying","no-img");
+    }
+
+    function restartAnimations(){
+      timelineWrap.classList.remove("playing-anim");
+      progressFill.classList.remove("playing");
+      void timelineWrap.offsetHeight;
+      timelineWrap.classList.add("playing-anim");
+      progressFill.classList.add("playing");
+    }
+
+    function setKhomjiwPose(src){
+      if(!khomjiwImg || khomjiw.classList.contains("no-img")) return;
+      khomjiwImg.src = src;
+    }
+
+    function flyKhomjiwTo(item){
+      khomjiw.classList.remove("pos1","pos2","pos3","flying");
+      void khomjiw.offsetHeight;
+      khomjiw.classList.add("show", item.pos, "talking", "flying");
+      setTimeout(() => khomjiw.classList.remove("flying"), 2200);
+    }
+
+    function showStep(item){
+      item.el.classList.add("show");
+      item.el.classList.remove("hide");
+
+      setKhomjiwPose(item.pose);
+      flyKhomjiwTo(item);
+      khomjiwBubble.textContent = item.bubble;
+
+      speakKhomjiw(item.speech);
+    }
+
+    function stopAllSpeech(){
+      try{
+        if("speechSynthesis" in window){
+          window.speechSynthesis.cancel();
+          // บาง Android/Chrome ยังมีคิวเสียงค้าง จึง cancel ซ้ำเล็กน้อย
+          setTimeout(() => window.speechSynthesis.cancel(), 60);
+          setTimeout(() => window.speechSynthesis.cancel(), 180);
+        }
+      }catch(err){}
+      khomjiw.classList.remove("talking");
+    }
+
+    function goTour(){
+      clearTimers();
+      stopAllSpeech();
+      screen.classList.add("fade-out");
+      setTimeout(() => {
+        stopAllSpeech();
+        window.location.href = TOUR_URL;
+      }, 650);
+    }
+
+    function startIntro(){
+      if(started) return;
+      started = true;
+
+      tapLayer.classList.add("hidden");
+      voiceNote.classList.remove("show");
+      clearTimers();
+      resetCards();
+      restartAnimations();
+
+      cards.forEach(item => {
+        timers.push(setTimeout(() => showStep(item), item.show));
+        timers.push(setTimeout(() => item.el.classList.add("hide"), item.hide));
+      });
+
+      timers.push(setTimeout(goTour, INTRO_DURATION));
+    }
+
+    function skipIntro(){
+      clearTimers();
+      stopAllSpeech();
+      goTour();
+    }
+
+    startBtn.addEventListener("click", startIntro);
+    startCardBtn.addEventListener("click", startIntro);
+    skipBtn.addEventListener("click", skipIntro);
+
+    document.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " ") startIntro();
+      if(e.key === "Escape") skipIntro();
+    });
+
+    
+    // หยุดเสียงทุกกรณีเมื่อออกจากหน้า กดกลับ เปลี่ยนแท็บ รีโหลด หรือปิดหน้า
+    window.addEventListener("beforeunload", stopAllSpeech);
+    window.addEventListener("pagehide", stopAllSpeech);
+    document.addEventListener("visibilitychange", () => {
+      if(document.hidden) stopAllSpeech();
+    });
+
+    setupKhomjiwImageFallback();
+    makeParticles();
+  </script>
+
+</body>
+</html>
