@@ -2908,6 +2908,7 @@ function toggleChat(){
     if(typeof kjExpress==='function'&&typeof KJ!=='undefined'){kjExpress(KJ.ASK,0);isExpressing=true;stopBlinking();}
   } else {
     chat.classList.remove('open');
+   window.speechSynthesis.cancel()
     if(bubble) bubble.style.display = '';
     if(typeof KJ!=='undefined'&&typeof setExpr==='function'){isExpressing=false;setExpr(KJ.NORMAL);startBlinking();resetIdleTimer();}
   }
@@ -2915,6 +2916,7 @@ function toggleChat(){
 
 function closeChat(){
   chatOpen = false;
+ window.speechSynthesis.cancel()
   document.getElementById('khomjiw-chat').classList.remove('open');
   const bubble = document.getElementById('khomjiw-bubble');
   if(bubble) bubble.style.display = '';
@@ -3044,6 +3046,7 @@ function showKhomjiw(){
 function hideKhomjiw(){
   const c = document.getElementById('khomjiw-container');
   const chat = document.getElementById('khomjiw-chat');
+ window.speechSynthesis.cancel()
   if(c) c.classList.remove('visible');
   if(chat) chat.classList.remove('open');
   chatOpen = false;
