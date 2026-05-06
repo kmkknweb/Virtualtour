@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0">
+
+<title>Video Tour</title>
+
+<style>
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000;
+}
+
+#tourVideo{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#000;
+}
+
+#skipBtn{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:20;
+
+  padding:12px 22px;
+
+  border:none;
+  border-radius:30px;
+
+  background:rgba(0,0,0,.45);
+  color:#fff;
+
+  font-size:15px;
+  cursor:pointer;
+
+  backdrop-filter:blur(10px);
+}
+
+#skipBtn:hover{
+  background:rgba(0,0,0,.7);
+}
+
+</style>
+</head>
+
+<body>
+
+<video
+  id="tourVideo"
+  autoplay
+  playsinline
+  webkit-playsinline
+  controls>
+
+  <source
+    src="video/shrine-tour.mp4"
+    type="video/mp4">
+
+</video>
+
+<button id="skipBtn"
+        onclick="goBack()">
+  กลับหน้าหลัก
+</button>
+
+<script>
+
+const video =
+document.getElementById("tourVideo");
+
+async function forceFullscreen(){
+
+  try{
+
+    if(video.requestFullscreen){
+      await video.requestFullscreen();
+    }
+
+  }catch(err){}
+
+}
+
+video.addEventListener(
+  "loadeddata",
+  () => {
+
+    forceFullscreen();
+
+  }
+);
+
+function goBack(){
+
+  window.location.href =
+  "tour.html";
+
+}
+
+video.addEventListener(
+  "ended",
+  () => {
+
+    window.location.href =
+    "tour.html";
+
+  }
+);
+
+</script>
+
+</body>
+</html>
