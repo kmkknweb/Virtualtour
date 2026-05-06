@@ -153,6 +153,10 @@
   </style>
 </head>
 <body>
+  <audio id="introMusic"
+       src="audio/intro-theme.mp3"
+       preload="auto"
+       loop></audio>
   <main id="intro-screen">
     <div class="bg-glow"></div><div id="particles"></div>
     <header class="intro-header"><div class="intro-pre">VIRTUAL TOUR INTRO</div><h1 class="intro-title">ศาลเจ้าปึงเถ่ากงม่าขอนแก่น</h1><div class="intro-sub">การเดินทางของแสงศรัทธา</div></header>
@@ -404,6 +408,42 @@
 
     setupKhomjiwImageFallback();
     makeParticles();
+
+    const introMusic = document.getElementById("introMusic");
+
+async function startIntro(){
+
+  try{
+    introMusic.volume = 0.20;
+    await introMusic.play();
+  }catch(err){}
+
+}
+    function stopIntroAudio(){
+
+  try{
+    introMusic.pause();
+    introMusic.currentTime = 0;
+  }catch(err){}
+
+  try{
+    speechSynthesis.cancel();
+  }catch(err){}
+    }
+    function goTour(){
+
+  stopIntroAudio();
+
+  window.location.href = "tour.html";
+    }
+    window.addEventListener("beforeunload", stopIntroAudio);
+window.addEventListener("pagehide", stopIntroAudio);
+
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){
+    stopIntroAudio();
+  }
+});
   </script>
 
 </body>
