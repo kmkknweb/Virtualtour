@@ -2845,7 +2845,7 @@ async function askAI(question) {
 
 async function askQuestion(key){
   addUserMessage(key);
-  addBotMessage("น้องโคมจิ๋วกำลังหาคำตอบ...");
+  addBotMessage("รอสักครู่ครับ...");
 
   const img = (typeof kjImg === 'function') ? kjImg() : null;
   if(img && typeof KJ !== 'undefined') img.src = KJ.QUESTION;
@@ -2871,7 +2871,7 @@ async function sendChat(){
   addUserMessage(q);
   input.value = '';
 
-  addBotMessage("น้องโคมจิ๋วกำลังหาคำตอบ...");
+  addBotMessage("รอสักครู่ครับ...");
 
   const img = (typeof kjImg === 'function') ? kjImg() : null;
   if(img && typeof KJ !== 'undefined') img.src = KJ.QUESTION;
