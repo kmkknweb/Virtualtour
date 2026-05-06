@@ -2804,6 +2804,16 @@ function addBotMessage(text){
   const div = document.createElement('div');
   div.className = 'chat-msg-bot';
   div.innerHTML = '<div class="chat-msg-bot-bubble">' + text + '</div>';
+
+// เพิ่มเสียงพูด
+const utterance = new SpeechSynthesisUtterance(answer);
+utterance.lang = 'th-TH';
+utterance.rate = 0.9;
+utterance.pitch = 1.2;
+window.speechSynthesis.speak(utterance);
+
+ 
+ 
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
