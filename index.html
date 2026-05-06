@@ -2051,6 +2051,7 @@ function enterTour(){
 document.getElementById('btn-back-map').addEventListener('click',()=>{
   if(viewer){viewer.destroy();viewer=null;}
   stopBgAudio();
+ window.speechSynthesis.cancel();
   hideKhomjiw();
   showScreen('screen-landing');
 });
