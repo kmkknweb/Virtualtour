@@ -2845,7 +2845,7 @@ async function askQuestion(key){
 
   try {
     const ans = await askAI(key);
-    addBotMessage(ans || "ขออภัยค่ะ โคมจิ๋วยังตอบไม่ได้ 🙏");
+    addBotMessage(ans || "ขออภัยครับ โคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
     addBotMessage("ERROR: " + e.message);
   }
@@ -2871,7 +2871,7 @@ async function sendChat(){
 
   try {
     const ans = await askAI(q);
-    addBotMessage(ans || "ขออภัยค่ะ โคมจิ๋วยังตอบไม่ได้ 🙏");
+    addBotMessage(ans || "ขออภัยครับ โคมจิ๋วยังตอบไม่ได้ 🙏");
   } catch (e) {
     addBotMessage("ERROR: " + e.message);
   
