@@ -935,7 +935,26 @@ textarea.form-input{height:65px;resize:none;}
   color:#fff;
   border:1px solid rgba(255,255,255,0.3);
 }
+.intro-video-btn{
+  margin-top:10px;
+  background:linear-gradient(
+    135deg,
+    rgba(242,196,107,.18),
+    rgba(200,144,26,.08)
+  );
+  border:1px solid rgba(242,196,107,.45);
+  color:#ffe5b1;
+  box-shadow:
+    0 0 18px rgba(242,196,107,.12),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
 
+.intro-video-btn:hover{
+  transform:scale(1.04);
+  box-shadow:
+    0 0 28px rgba(242,196,107,.22),
+    0 0 60px rgba(200,144,26,.08);
+}
 .intro-btn:hover{
   transform:scale(1.05);
 }
@@ -1517,7 +1536,13 @@ box-shadow:
       <div class="stamp-promo-icon">🏮</div>
       <div class="stamp-promo-text">ชมเทพครบ <strong>7 องค์</strong> เก็บแสตมป์<br>แลกสติ๊กเกอร์ LINE &amp; เซียมซีดิจิทัล <strong>ฟรี!</strong></div>
     </div>
-    <button class="btn-enter" id="btn-enter">✦ เข้าชม ทัวร์เสมือนจริง ✦</button>
+    <button class="btn-enter" id="btn-enter">✦ เข้าชม Virtual tour✦</button>
+   <button
+    class="intro-btn secondary intro-video-btn"
+    onclick="openVideoTour()">
+    รับชม Video Tour
+   </button>
+   
     <div class="info-tags">
       <span class="info-tag">🔭 360° Panorama</span>
       <span class="info-tag">🏮 7 องค์เทพ</span>
@@ -3112,7 +3137,11 @@ document.addEventListener('DOMContentLoaded', function(){
 // also try immediately in case DOM already ready
 if(document.readyState !== 'loading') updateStampUI();
 
+function openVideoTour(){
 
+  window.location.href = "video-tour.html";
+
+}
 </script>
 
 
